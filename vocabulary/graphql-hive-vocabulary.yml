@@ -1,0 +1,182 @@
+vocabulary:
+  name: GraphQL Hive Vocabulary
+  description: >-
+    Domain vocabulary for GraphQL Hive — an open-source GraphQL schema registry
+    and observability platform. Covers schema management, usage tracking,
+    federation composition, breaking change detection, access control, and
+    gateway routing.
+  url: https://the-guild.dev/graphql/hive/docs
+  version: "1.0"
+  created: "2026-06-13"
+
+terms:
+  # Core platform concepts
+  - term: SchemaRegistry
+    label: Schema Registry
+    description: >-
+      Central repository for storing, validating, and versioning GraphQL schemas
+      across teams and services.
+    url: https://the-guild.dev/graphql/hive/docs
+
+  - term: SchemaVersion
+    label: Schema Version
+    description: >-
+      A specific revision of a GraphQL schema stored in the registry, identified
+      by a unique version identifier and linked to a commit/deployment.
+    url: https://the-guild.dev/graphql/hive/docs/schema-registry/publish-schema
+
+  - term: SchemaCheck
+    label: Schema Check
+    description: >-
+      Validation run performed against a proposed schema change to detect
+      breaking changes, composition errors, and policy violations before
+      publishing.
+    url: https://the-guild.dev/graphql/hive/docs/schema-registry/check-schema
+
+  - term: BreakingChange
+    label: Breaking Change
+    description: >-
+      A schema modification that removes, renames, or alters types or fields in
+      a backwards-incompatible way that would break existing clients or
+      operations.
+    url: https://the-guild.dev/graphql/hive/docs/schema-registry/check-schema
+
+  - term: Target
+    label: Target
+    description: >-
+      A deployment environment (e.g., development, staging, production) within a
+      project that holds an independent schema version history.
+    url: https://the-guild.dev/graphql/hive/docs
+
+  - term: Project
+    label: Project
+    description: >-
+      A grouping of targets and schemas within an organization, corresponding to
+      a GraphQL API or service.
+    url: https://the-guild.dev/graphql/hive/docs
+
+  - term: Organization
+    label: Organization
+    description: >-
+      Top-level entity in Hive that owns projects, members, and billing. Maps
+      to a company or team using the Hive platform.
+    url: https://the-guild.dev/graphql/hive/docs
+
+  - term: AccessToken
+    label: Access Token
+    description: >-
+      Bearer authentication credential with hvo1/ prefix used to authenticate
+      CLI commands and API requests against the Hive console API.
+    url: https://the-guild.dev/graphql/hive/docs/graphql-api/access-token-management
+
+  # Usage tracking
+  - term: UsageReport
+    label: Usage Report
+    description: >-
+      Payload submitted by Hive clients containing a map of GraphQL operations
+      and their execution statistics for observability and analytics.
+    url: https://the-guild.dev/graphql/hive/docs/schema-registry/usage-tracking
+
+  - term: OperationMapRecord
+    label: Operation Map Record
+    description: >-
+      Entry in a usage report's operation map keyed by a hash, containing the
+      raw GraphQL operation string, operation name, and list of accessed fields.
+    url: https://the-guild.dev/graphql/hive/docs/schema-registry/usage-tracking
+
+  - term: RequestOperation
+    label: Request Operation
+    description: >-
+      Individual execution instance within a usage report, referencing an
+      operation map key with timestamp, execution stats, and optional client
+      metadata.
+    url: https://the-guild.dev/graphql/hive/docs/schema-registry/usage-tracking
+
+  - term: SubscriptionOperation
+    label: Subscription Operation
+    description: >-
+      Usage report entry for GraphQL subscription executions, carrying timestamp,
+      operation map reference, and optional client metadata.
+    url: https://the-guild.dev/graphql/hive/docs/schema-registry/usage-tracking
+
+  - term: Execution
+    label: Execution
+    description: >-
+      Object within a request operation recording whether execution succeeded
+      (ok), total duration in nanoseconds, and total error count.
+    url: https://the-guild.dev/graphql/hive/docs/schema-registry/usage-tracking
+
+  # Federation
+  - term: Subgraph
+    label: Subgraph
+    description: >-
+      An individual GraphQL service that is part of a federated supergraph,
+      exposing a partial schema that Hive composes and validates.
+    url: https://the-guild.dev/graphql/hive/docs/graphql-federation
+
+  - term: Supergraph
+    label: Supergraph
+    description: >-
+      The composed federated schema produced by merging all subgraph schemas,
+      stored as a CDN artifact and consumed by gateway routers.
+    url: https://the-guild.dev/graphql/hive/docs/graphql-federation
+
+  - term: FederationComposition
+    label: Federation Composition
+    description: >-
+      The process of merging subgraph schemas according to Apollo Federation or
+      Hive's open-source federation-composition specification.
+    url: https://the-guild.dev/graphql/hive/docs/graphql-federation
+
+  # Gateway / Router
+  - term: HiveGateway
+    label: Hive Gateway
+    description: >-
+      The JavaScript/TypeScript-based GraphQL federation gateway (v2+) that
+      routes and plans queries across subgraphs, built on GraphQL Yoga and Mesh.
+    url: https://the-guild.dev/graphql/hive/blog/hive-gateway-v2
+
+  - term: HiveRouter
+    label: Hive Router
+    description: >-
+      A high-performance Rust-based GraphQL federation gateway with support for
+      subscriptions, persisted documents, circuit breakers, and OpenTelemetry.
+    url: https://the-guild.dev/graphql/hive/blog/welcome-hive-router
+
+  # Artifacts & delivery
+  - term: PersistedDocument
+    label: Persisted Document
+    description: >-
+      A pre-registered GraphQL operation stored in Hive and referenced by a
+      stable hash, allowing clients to send only the hash rather than the full
+      query string, improving security and performance.
+    url: https://the-guild.dev/graphql/hive/product-updates/2026-04-17-hive-router-persisted-documents
+
+  - term: AppDeployment
+    label: App Deployment
+    description: >-
+      A versioned bundle of persisted documents linked to a specific application
+      release, enabling Hive to track which operations are active per deployment.
+    url: https://the-guild.dev/graphql/hive/product-updates/2026-03-05-app-deployments
+
+  - term: CDNArtifact
+    label: CDN Artifact
+    description: >-
+      A versioned schema artifact (e.g., supergraph SDL, service SDL) distributed
+      via Hive's content delivery network for consumption by gateway instances.
+    url: https://the-guild.dev/graphql/hive/product-updates/2025-12-09-versioned-cdn-artifacts
+
+  # API surface
+  - term: GraphQLEndpoint
+    label: GraphQL Endpoint
+    description: >-
+      The primary HTTPS endpoint for the Hive Console GraphQL API, located at
+      https://api.graphql-hive.com/graphql, accepting POST requests.
+    url: https://the-guild.dev/graphql/hive/docs/graphql-api
+
+  - term: OIDCIntegration
+    label: OIDC Integration
+    description: >-
+      OpenID Connect provider integration in Hive enabling SSO, account linking,
+      and invitation-only organization access control.
+    url: https://the-guild.dev/graphql/hive/product-updates/2026-02-11-account-linking-and-invitation-only-oidc

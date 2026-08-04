@@ -1,0 +1,95 @@
+specificationVersion: '0.1'
+id: graphql-hive-plans-pricing
+name: GraphQL Hive Plans and Pricing
+description: >-
+  Pricing plans for GraphQL Hive cloud service. All plans include unlimited
+  team seats, projects, organizations, schema pushes and checks, SSO via
+  OpenID, and access to all platform features. Billing is based on GraphQL
+  operations volume per month.
+url: https://the-guild.dev/graphql/hive/pricing
+plans:
+  - name: Hobby
+    description: >-
+      Free forever plan for side projects and personal use. Includes full
+      access to all GraphQL Hive features with up to 1 million operations
+      per month and 7 days of data retention.
+    price: 0
+    currency: USD
+    period: monthly
+    free: true
+    limits:
+      - name: Operations
+        description: GraphQL operations tracked per month
+        quota: 1000000
+        unit: operations
+      - name: DataRetention
+        description: Usage data and analytics retention window
+        quota: 7
+        unit: days
+    features:
+      - Schema registry with version control
+      - Breaking change detection
+      - Usage analytics and monitoring
+      - Unlimited seats, projects, and organizations
+      - Unlimited schema pushes and checks
+      - SSO via OpenID
+      - GitHub issues and chat support
+      - 99.95% uptime SLA
+  - name: Pro
+    description: >-
+      Scalable plan for teams and production workloads. Starts at $20/month
+      with 1 million included operations and additional usage-based billing
+      at $10 per million operations beyond the base.
+    price: 20
+    currency: USD
+    period: monthly
+    free: false
+    limits:
+      - name: Operations
+        description: Base monthly operations included (additional at $10/M)
+        quota: 1000000
+        unit: operations
+      - name: DataRetention
+        description: Usage data and analytics retention window
+        quota: 90
+        unit: days
+    features:
+      - Everything in Hobby
+      - 90-day data retention
+      - Usage-based scaling beyond 1M operations ($10/M additional)
+      - GitHub issues and chat support
+      - 99.95% uptime SLA
+    overage:
+      - name: AdditionalOperations
+        description: Per million operations beyond the 1M base
+        price: 10
+        currency: USD
+        unit: per million operations
+  - name: Enterprise
+    description: >-
+      Custom plan for large organizations requiring dedicated support,
+      volume discounts, extended data retention, and custom SLA agreements.
+      Contact The Guild for custom pricing.
+    price: custom
+    currency: USD
+    period: monthly
+    free: false
+    limits:
+      - name: Operations
+        description: Custom limits with volume discounts
+        quota: custom
+        unit: operations
+      - name: DataRetention
+        description: Minimum one year, customizable beyond that
+        quota: 365
+        unit: days
+    features:
+      - Everything in Pro
+      - Minimum one year data retention (customizable)
+      - Volume discounts on operations
+      - Ability to exceed limits without data loss
+      - Dedicated Slack channel
+      - White-glove onboarding
+      - 24/7 SLA-based support
+      - Custom DPA (Data Processing Agreement)
+      - Custom contracts

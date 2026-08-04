@@ -1,0 +1,446 @@
+aid: the-guild-dev
+name: The Guild
+url: https://raw.githubusercontent.com/api-evangelist/the-guild-dev/refs/heads/main/apis.yml
+description: The Guild is an open-source software group building much of the GraphQL ecosystem's tooling,
+  published together at the-guild.dev. Its portfolio spans GraphQL Hive (schema registry, usage observability
+  and breaking-change detection), GraphQL Mesh (composing many APIs into one graph), GraphQL Yoga (server),
+  Envelop (plugin runtime), GraphQL Tools and Schema Stitching (schema composition), GraphQL Code Generator
+  (typed clients and servers), GraphQL Inspector (schema diffing and CI checks) and GraphQL Scalars. Every
+  product listed here shares the-guild.dev as its home, which is why they are profiled as one provider
+  with many APIs rather than as separate companies.
+image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/graphql-hive.png
+created: '2026-08-03'
+modified: '2026-08-03'
+specificationVersion: 0.21
+type: Index
+position: Providing
+tags:
+- API Composition
+- API Gateway
+- API Observability
+- Breaking Change Detection
+- CI/CD
+- Code Generation
+- Developer Tools
+- Execution
+- Federation
+- GitHub Actions
+- GraphQL
+- JavaScript
+- Microservices
+- Middleware
+- Mocking
+- Open Source
+- Plugins
+- REST
+- SDKs
+- Scalars
+- Schema
+- Schema Composition
+- Schema Merging
+- Schema Registry
+- Schema Stitching
+- Schema Transformation
+- Schema Validation
+- Server
+- Subscriptions
+- The Guild
+- Type Merging
+- Type Safety
+- TypeScript
+- gRPC
+apis:
+- aid: the-guild-dev:envelop-api
+  name: Envelop API
+  description: The @envelop/core package exposes the envelop() function and a set of built-in plugins
+    (useSchema, useEngine, useLogger, useMaskedErrors, useExtendContext) that wrap the GraphQL execution
+    pipeline — parse, validate, execute, and subscribe — with composable lifecycle hooks.
+  tags:
+  - GraphQL
+  - Plugins
+  - Hooks
+  - Execution
+  humanURL: https://the-guild.dev/graphql/envelop/docs/getting-started
+  baseURL: https://the-guild.dev/graphql/envelop
+  properties:
+  - url: https://the-guild.dev/graphql/envelop/docs/getting-started
+    type: Documentation
+  - url: graphql/envelop-graphql.md
+    type: GraphQL
+- aid: the-guild-dev:graphql-code-generator
+  name: GraphQL Code Generator
+  description: GraphQL Code Generator generates typed code from GraphQL schemas and operations, supporting
+    TypeScript, React Query, Apollo Client, and many other frameworks through its plugin system.
+  humanURL: https://the-guild.dev/graphql/codegen
+  tags:
+  - Code Generation
+  - GraphQL
+  - SDKs
+  properties:
+  - type: Documentation
+    url: https://the-guild.dev/graphql/codegen/docs/getting-started
+  - type: GettingStarted
+    url: https://the-guild.dev/graphql/codegen/docs/getting-started
+  - type: GitHubRepository
+    url: https://github.com/dotansimha/graphql-code-generator
+  - url: graphql/graphql-codegen-graphql.md
+    type: GraphQL
+- aid: the-guild-dev:graphql-hive-console-graphql-api
+  name: GraphQL Hive Console GraphQL API
+  description: The public GraphQL API for Hive Console allows developers to build custom workflows, administer
+    users and access tokens, retrieve usage metrics, manage schema registries, publish schemas, validate
+    compatibility, and track breaking changes programmatically without the CLI. Authentication uses Bearer
+    tokens with the hvo1/ prefix format.
+  image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
+  baseURL: https://api.graphql-hive.com/graphql
+  humanURL: https://the-guild.dev/graphql/hive/docs/graphql-api/access-token-management
+  contact:
+  - FN: GraphQL Hive Support
+    url: https://github.com/graphql-hive/console/issues
+  tags:
+  - GraphQL
+  - Schema Registry
+  - Observability
+  - Usage Tracking
+  - Breaking Change Detection
+  properties:
+  - type: Documentation
+    url: https://the-guild.dev/graphql/hive/docs
+  - type: APIReference
+    url: https://the-guild.dev/graphql/hive/docs/api-reference/cli
+  - type: GraphQLEndpoint
+    url: https://api.graphql-hive.com/graphql
+  - type: OpenAPI
+    url: https://the-guild.dev/graphql/hive/docs/graphql-api/access-token-management
+  - url: graphql/graphql-hive-graphql.md
+    type: GraphQL
+  overlays: []
+- aid: the-guild-dev:graphql-inspector-cli
+  name: GraphQL Inspector CLI
+  description: Command-line tool for comparing two GraphQL schemas and generating a detailed list of breaking,
+    non-breaking, and dangerous changes. Also validates documents and fragments, measures schema coverage,
+    and introspects live GraphQL endpoints. Installable via npm as @graphql-inspector/cli.
+  image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
+  humanURL: https://the-guild.dev/graphql/inspector/docs
+  contact:
+  - FN: GraphQL Inspector Support
+    url: https://github.com/graphql-hive/graphql-inspector/issues
+  tags:
+  - GraphQL
+  - Schema Validation
+  - Breaking Change Detection
+  - CLI
+  - Open Source
+  properties:
+  - type: Documentation
+    url: https://the-guild.dev/graphql/inspector/docs
+  - type: InstallationGuide
+    url: https://the-guild.dev/graphql/inspector/docs/installation
+  - type: GitHubRepository
+    url: https://github.com/graphql-hive/graphql-inspector
+  - type: GraphQL
+    url: graphql/graphql-inspector-graphql.md
+  overlays: []
+- aid: the-guild-dev:graphql-mesh-api
+  name: GraphQL Mesh API
+  description: GraphQL federation framework that composes any API service — REST, OpenAPI, gRPC, SOAP,
+    OData, JSON Schema, GraphQL, and databases — into a unified, type-safe GraphQL schema with built-in
+    transforms, caching, and mocking.
+  tags:
+  - GraphQL
+  - Federation
+  - API Gateway
+  - Schema Composition
+  - Open Source
+  humanURL: https://the-guild.dev/graphql/mesh/docs
+  baseURL: https://the-guild.dev/graphql/mesh
+  properties:
+  - url: https://the-guild.dev/graphql/mesh/docs
+    type: Documentation
+  - url: graphql/graphql-mesh-graphql.md
+    type: GraphQL
+  - type: JSONSchema
+    url: https://raw.githubusercontent.com/api-evangelist/graphql-mesh/refs/heads/main/json-schema/meshrc-configuration.json
+- aid: the-guild-dev:graphql-scalars-api
+  name: GraphQL Scalars API
+  description: Open-source TypeScript/JavaScript library providing 80+ custom GraphQL scalar types (DateTime,
+    EmailAddress, UUID, IPv4, IBAN, JSONObject, etc.) for building precise, type-safe GraphQL schemas
+    compatible with any GraphQL server implementation.
+  tags:
+  - GraphQL
+  - Scalars
+  - TypeScript
+  - Open Source
+  humanURL: https://the-guild.dev/graphql/scalars/docs
+  baseURL: https://the-guild.dev/graphql/scalars
+  properties:
+  - url: https://the-guild.dev/graphql/scalars/docs
+    type: Documentation
+  - url: graphql/graphql-scalars-graphql.md
+    type: GraphQL
+- aid: the-guild-dev:graphql-tools-api
+  name: GraphQL Tools API
+  description: A set of utilities for faster GraphQL development, enabling SDL-first schema building,
+    type-safe resolver composition, schema stitching across multiple services, fine-grained mocking, and
+    schema transformation and delegation.
+  tags:
+  - GraphQL
+  - Schema Stitching
+  - Mocking
+  - Schema Merging
+  - Federation
+  humanURL: https://the-guild.dev/graphql/tools/docs
+  baseURL: https://the-guild.dev/graphql/tools
+  properties:
+  - url: https://the-guild.dev/graphql/tools/docs
+    type: Documentation
+  - url: graphql/graphql-tools-graphql.md
+    type: GraphQL
+- aid: the-guild-dev:graphql-yoga-server
+  name: GraphQL Yoga Server
+  description: 'GraphQL Yoga is a self-hosted GraphQL server library — each deployment exposes its own
+    GraphQL endpoint (default: /graphql). The library handles request parsing, execution, subscriptions,
+    file uploads, CORS, and plugin lifecycle for any GraphQL schema you provide.
+
+    '
+  tags:
+  - GraphQL
+  - Server
+  humanURL: https://the-guild.dev/graphql/yoga-server/docs
+  baseURL: https://your-server.example.com/graphql
+  properties:
+  - url: https://the-guild.dev/graphql/yoga-server/docs
+    type: Documentation
+  - url: graphql/graphql-yoga-graphql.md
+    type: GraphQL
+- aid: the-guild-dev:hive-gateway
+  name: Hive Gateway
+  description: Hive Gateway is a federated GraphQL routing engine from The Guild that supports both Apollo
+    Federation and Schema Stitching approaches to compose distributed GraphQL services.
+  humanURL: https://the-guild.dev/graphql/hive/docs/gateway
+  tags:
+  - API Gateway
+  - Federation
+  - GraphQL
+  properties:
+  - type: Documentation
+    url: https://the-guild.dev/graphql/hive/docs/gateway
+  - type: GitHubRepository
+    url: https://github.com/the-guild-org/gateway
+- aid: the-guild-dev:schema-stitching
+  name: Schema Stitching
+  description: Schema Stitching is a GraphQL technique for combining multiple GraphQL schemas into a single
+    unified API gateway. The @graphql-tools/stitch package creates a combined proxy layer that delegates
+    requests through to underlying service APIs, supporting type merging, stitching directives, and automated
+    query planning comparable to Apollo Federation.
+  humanURL: https://the-guild.dev/graphql/stitching
+  tags:
+  - API Composition
+  - GraphQL
+  - Schema Stitching
+  - Type Merging
+  properties:
+  - type: Documentation
+    url: https://the-guild.dev/graphql/stitching/docs
+  - type: GettingStarted
+    url: https://the-guild.dev/graphql/stitching/docs/getting-started
+  - type: Handbook
+    url: https://the-guild.dev/graphql/stitching/handbook
+  - type: GitHubRepository
+    url: https://github.com/ardatan/graphql-tools
+  - type: npm Package
+    url: https://www.npmjs.com/package/@graphql-tools/stitch
+  - type: JSONSchema
+    url: https://raw.githubusercontent.com/api-evangelist/schema-stitching/refs/heads/main/json-schema/schema-stitching-config-schema.json
+  - type: JSONStructure
+    url: https://raw.githubusercontent.com/api-evangelist/schema-stitching/refs/heads/main/json-structure/schema-stitching-config-structure.json
+  - type: JSONLD
+    url: https://raw.githubusercontent.com/api-evangelist/schema-stitching/refs/heads/main/json-ld/schema-stitching-context.jsonld
+  - url: graphql/schema-stitching-graphql.md
+    type: GraphQL
+common:
+- type: DomainSecurity
+  url: security/graphql-hive-domain-security.yml
+- type: Website
+  url: https://the-guild.dev/graphql/hive
+- type: Documentation
+  url: https://the-guild.dev/graphql/hive/docs
+- type: GitHubOrg
+  url: https://github.com/graphql-hive
+- type: LinkedIn
+  url: https://linkedin.com/company/the-guild-software
+- type: Blog
+  url: https://the-guild.dev/graphql/hive/blog
+- type: Pricing
+  url: https://the-guild.dev/graphql/hive/pricing
+- type: StatusPage
+  url: https://status.graphql-hive.com/
+- type: X
+  url: https://twitter.com/TheGuildDev
+- type: Plans
+  url: plans/graphql-hive-plans-pricing.yml
+- type: RateLimits
+  url: rate-limits/graphql-hive-rate-limits.yml
+- type: FinOps
+  url: finops/graphql-hive-finops.yml
+- type: DomainSecurity
+  url: security/graphql-mesh-domain-security.yml
+- url: https://the-guild.dev/graphql/mesh
+  type: Website
+- url: https://the-guild.dev/graphql/mesh/docs
+  type: Documentation
+- url: https://the-guild.dev/graphql/mesh/docs/getting-started
+  type: GettingStarted
+- url: https://www.linkedin.com/company/the-guild-software
+  type: LinkedIn
+- url: https://github.com/the-guild-org
+  type: GitHubOrganization
+- url: https://github.com/ardatan/graphql-mesh
+  type: GitHub
+- url: https://the-guild.dev/blog
+  type: Blog
+- url: plans/graphql-mesh-plans.md
+  type: Plans
+- url: rate-limits/graphql-mesh-rate-limits.md
+  type: RateLimits
+- url: finops/graphql-mesh-finops.md
+  type: FinOps
+- type: DomainSecurity
+  url: security/graphql-yoga-domain-security.yml
+- url: https://the-guild.dev/graphql/yoga-server
+  type: Website
+- url: https://the-guild.dev/graphql/yoga-server/docs
+  type: Documentation
+- url: https://www.linkedin.com/company/the-guild-of-developers/
+  type: LinkedIn
+- url: https://github.com/dotansimha/graphql-yoga
+  type: GitHubOrganization
+- url: plans/graphql-yoga-plans.md
+  type: Plans
+- url: rate-limits/graphql-yoga-rate-limits.md
+  type: RateLimits
+- url: finops/graphql-yoga-finops.md
+  type: FinOps
+- type: DomainSecurity
+  url: security/graphql-tools-domain-security.yml
+- url: https://the-guild.dev/graphql/tools
+  type: Website
+- url: https://the-guild.dev/graphql/tools/docs
+  type: Documentation
+- url: https://github.com/ardatan/graphql-tools
+  type: GitHubOrganization
+- url: https://the-guild.dev/graphql/tools/docs
+  type: Pricing
+- url: plans/graphql-tools-plans.md
+  type: Plans
+- url: rate-limits/graphql-tools-rate-limits.md
+  type: RateLimits
+- url: finops/graphql-tools-finops.md
+  type: FinOps
+- type: DomainSecurity
+  url: security/graphql-code-generator-domain-security.yml
+- url: https://the-guild.dev/graphql/codegen
+  type: Website
+- url: https://the-guild.dev/graphql/codegen/docs
+  type: Documentation
+- url: https://the-guild.dev/graphql/hive#pricing
+  type: Pricing
+- url: plans/graphql-code-generator-plans.md
+  type: Plans
+- url: rate-limits/graphql-code-generator-rate-limits.md
+  type: RateLimits
+- url: finops/graphql-code-generator-finops.md
+  type: FinOps
+- url: https://graphql-codegen.com/feed
+  type: Blog
+- type: DomainSecurity
+  url: security/graphql-codegen-domain-security.yml
+- type: Documentation
+  url: https://the-guild.dev/graphql/codegen/docs/getting-started
+- type: GitHubOrganization
+  url: https://github.com/dotansimha/graphql-code-generator
+- type: Plugins
+  url: https://the-guild.dev/graphql/codegen/plugins
+- type: DomainSecurity
+  url: security/graphql-inspector-domain-security.yml
+- type: Website
+  url: https://the-guild.dev/graphql/inspector
+- type: Documentation
+  url: https://the-guild.dev/graphql/inspector/docs
+- type: GitHubOrganization
+  url: https://github.com/graphql-hive
+- type: Blog
+  url: https://the-guild.dev/blog/tag/graphql-inspector
+- type: Pricing
+  url: https://github.com/marketplace/graphql-inspector
+- type: Plans
+  url: plans/graphql-inspector-plans.md
+- type: RateLimits
+  url: rate-limits/graphql-inspector-rate-limits.md
+- type: FinOps
+  url: finops/graphql-inspector-finops.md
+- type: DomainSecurity
+  url: security/graphql-scalars-domain-security.yml
+- url: https://the-guild.dev/graphql/scalars
+  type: Website
+- url: https://the-guild.dev/graphql/scalars/docs
+  type: Documentation
+- url: https://github.com/graphql-hive/graphql-scalars
+  type: GitHubOrganization
+- url: plans/graphql-scalars-plans.md
+  type: Plans
+- url: rate-limits/graphql-scalars-rate-limits.md
+  type: RateLimits
+- url: finops/graphql-scalars-finops.md
+  type: FinOps
+- type: DomainSecurity
+  url: security/envelop-domain-security.yml
+- url: https://the-guild.dev/graphql/envelop
+  type: Website
+- url: https://the-guild.dev/graphql/envelop/docs
+  type: Documentation
+- url: https://github.com/graphql-hive/envelop
+  type: GitHubOrganization
+- url: https://the-guild.dev/graphql/envelop/plugins
+  type: Pricing
+- url: plans/envelop-plans.md
+  type: Plans
+- url: rate-limits/envelop-rate-limits.md
+  type: RateLimits
+- url: finops/envelop-finops.md
+  type: FinOps
+- type: DomainSecurity
+  url: security/schema-stitching-domain-security.yml
+- type: Website
+  url: https://the-guild.dev/graphql/stitching
+- type: Documentation
+  url: https://the-guild.dev/graphql/stitching/docs
+- type: Handbook
+  url: https://the-guild.dev/graphql/stitching/handbook
+- type: GitHubOrganization
+  url: https://github.com/ardatan
+- type: Vocabulary
+  url: https://raw.githubusercontent.com/api-evangelist/schema-stitching/refs/heads/main/vocabulary/schema-stitching-vocabulary.yml
+- type: Examples
+  url: https://raw.githubusercontent.com/api-evangelist/schema-stitching/refs/heads/main/examples/schema-stitching-basic-gateway-example.json
+- url: https://graphql-hive.com/llms.txt
+  type: LlmsText
+- url: graphql/the-guild-dev-hive-console.graphql
+  type: GraphQL
+maintainers:
+- FN: Kin Lane
+  email: kin@apievangelist.com
+x-merged-from:
+- graphql-hive
+- graphql-mesh
+- graphql-yoga
+- graphql-tools
+- graphql-code-generator
+- graphql-codegen
+- graphql-inspector
+- graphql-scalars
+- envelop
+- schema-stitching
+x-merge-note: Consolidated 2026-08-03 from ten slugs that all resolved to the-guild.dev paths and none
+  of which had its own domain. Per the domain-slug convention they are one provider; each former slug
+  is now an API entry here and is tombstoned in api-search/network/_data/retired.yml.

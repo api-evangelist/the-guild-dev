@@ -1,0 +1,96 @@
+{
+  "@context": {
+    "@version": 1.1,
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "schema": "https://schema.org/",
+    "hive": "https://the-guild.dev/graphql/hive/vocab#",
+    "graphql": "https://spec.graphql.org/",
+
+    "name": "schema:name",
+    "description": "schema:description",
+    "url": "schema:url",
+    "datePublished": {
+      "@id": "schema:datePublished",
+      "@type": "xsd:date"
+    },
+    "author": "schema:author",
+    "organization": "schema:Organization",
+
+    "GraphQLHive": "hive:GraphQLHive",
+    "SchemaRegistry": "hive:SchemaRegistry",
+    "GraphQLSchema": "hive:GraphQLSchema",
+    "SchemaVersion": "hive:SchemaVersion",
+    "SchemaCheck": "hive:SchemaCheck",
+    "BreakingChange": "hive:BreakingChange",
+    "UsageReport": "hive:UsageReport",
+    "OperationMap": "hive:OperationMap",
+    "OperationMapRecord": "hive:OperationMapRecord",
+    "RequestOperation": "hive:RequestOperation",
+    "SubscriptionOperation": "hive:SubscriptionOperation",
+    "Execution": "hive:Execution",
+    "PersistedDocument": "hive:PersistedDocument",
+    "AppDeployment": "hive:AppDeployment",
+    "Target": "hive:Target",
+    "Project": "hive:Project",
+    "Organization": "hive:Organization",
+    "AccessToken": "hive:AccessToken",
+    "HiveGateway": "hive:HiveGateway",
+    "HiveRouter": "hive:HiveRouter",
+    "FederationComposition": "hive:FederationComposition",
+    "Subgraph": "hive:Subgraph",
+    "Supergraph": "hive:Supergraph",
+    "CDNArtifact": "hive:CDNArtifact",
+
+    "graphqlEndpoint": {
+      "@id": "hive:graphqlEndpoint",
+      "@type": "@id"
+    },
+    "schemaVersion": "hive:schemaVersion",
+    "targetId": "hive:targetId",
+    "projectId": "hive:projectId",
+    "organizationId": "hive:organizationId",
+    "isBreaking": {
+      "@id": "hive:isBreaking",
+      "@type": "xsd:boolean"
+    },
+    "operationsTotal": {
+      "@id": "hive:operationsTotal",
+      "@type": "xsd:integer"
+    },
+    "duration": {
+      "@id": "hive:duration",
+      "@type": "xsd:integer"
+    },
+    "errorsTotal": {
+      "@id": "hive:errorsTotal",
+      "@type": "xsd:integer"
+    },
+    "ok": {
+      "@id": "hive:ok",
+      "@type": "xsd:boolean"
+    },
+    "timestamp": {
+      "@id": "hive:timestamp",
+      "@type": "xsd:integer"
+    },
+    "operation": "hive:operation",
+    "operationName": "hive:operationName",
+    "operationMapKey": "hive:operationMapKey",
+    "fields": "hive:fields",
+    "size": {
+      "@id": "hive:size",
+      "@type": "xsd:integer"
+    },
+    "bearerToken": "hive:bearerToken",
+    "tokenPrefix": "hive:tokenPrefix",
+    "plan": "hive:plan",
+    "selfHosted": {
+      "@id": "hive:selfHosted",
+      "@type": "xsd:boolean"
+    },
+    "openSource": {
+      "@id": "hive:openSource",
+      "@type": "xsd:boolean"
+    }
+  }
+}

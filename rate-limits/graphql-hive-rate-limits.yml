@@ -1,0 +1,68 @@
+specificationVersion: '0.1'
+id: graphql-hive-rate-limits
+name: GraphQL Hive Rate Limits
+description: >-
+  Rate limiting details for GraphQL Hive APIs. The Console GraphQL API
+  implements query complexity analysis per IBM's GraphQL cost specification.
+  Usage reporting and schema registry have soft limits based on plan tier.
+  Rate limit tuning is ongoing based on organization plan levels.
+url: https://the-guild.dev/graphql/hive/docs/graphql-api/access-token-management
+limits:
+  - name: GraphQLAPIComplexity
+    description: >-
+      The Console GraphQL API at api.graphql-hive.com/graphql uses query
+      complexity analysis to enforce rate limits. Based on the IBM GraphQL
+      cost specification. Values are still being tuned per organization plan.
+      Moderate operations are unlikely to be impacted.
+    type: complexity
+    scope: organization
+    unit: complexity-points
+    enforcement: hard
+    notes: >-
+      Rate limiting follows IBM GraphQL cost specification. The Hive team
+      is fine-tuning complexity thresholds based on organization plan tier.
+      Queries with high field counts, deep nesting, or large result sets
+      will incur higher complexity costs.
+  - name: HobbyOperationsQuota
+    description: >-
+      Hobby plan monthly operations quota for usage tracking and analytics.
+      Operations beyond this limit on the Hobby plan are dropped rather
+      than queued.
+    type: quota
+    scope: organization
+    quota: 1000000
+    period: monthly
+    unit: operations
+    enforcement: soft
+    plan: Hobby
+  - name: ProOperationsBase
+    description: >-
+      Pro plan base monthly operations included. Operations beyond this
+      base are billed at $10 per million additional operations with no
+      hard cap — data is never lost.
+    type: quota
+    scope: organization
+    quota: 1000000
+    period: monthly
+    unit: operations
+    enforcement: soft
+    plan: Pro
+  - name: SchemaChecksAndPublishes
+    description: >-
+      Schema pushes and checks are unlimited across all plans. There is no
+      rate limit on schema:publish or schema:check CLI operations.
+    type: unlimited
+    scope: organization
+    unit: schema-operations
+    enforcement: none
+    notes: Unlimited on all tiers including Hobby.
+  - name: CDNAccess
+    description: >-
+      The HA CDN and HA CDN Mirror for schema artifact fetching support
+      high-availability access to published schemas and supergraphs.
+      No documented rate limit; designed for production polling intervals.
+    type: unlimited
+    scope: organization
+    unit: cdn-requests
+    enforcement: none
+    notes: CDN is designed for high-availability with HA CDN and HA CDN Mirror.

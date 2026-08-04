@@ -1,0 +1,216 @@
+# GraphQL Hive
+
+> GraphQL Hive documentation
+
+## Docs
+
+- [Hive CLI (Command Line Interface)](https://hive-platform-docs.theguild.workers.dev/docs/api-reference/cli.md)
+- [Hive JavaScript Client Reference](https://hive-platform-docs.theguild.workers.dev/docs/api-reference/client.md)
+- [Hive Gateway CLI Reference](https://hive-platform-docs.theguild.workers.dev/docs/api-reference/gateway-cli.md): Hive Gateway CLI Reference
+- [Hive Gateway Configuration Reference](https://hive-platform-docs.theguild.workers.dev/docs/api-reference/gateway-config.md): Hive Gateway Configuration Reference
+- [Access Token Management via the GraphQL API](https://hive-platform-docs.theguild.workers.dev/docs/api-reference/graphql-api/access-token-management.md): Learn how to manage access tokens via the Hive Console GraphQL API.
+- [Contract Management via the GraphQL API](https://hive-platform-docs.theguild.workers.dev/docs/api-reference/graphql-api/contract-management.md): Learn how to manage contracts via the Hive Console GraphQL API.
+- [Using the GraphQL API](https://hive-platform-docs.theguild.workers.dev/docs/api-reference/graphql-api.md): Introduction to the Hive Console GraphQL API.
+- [Member Management via the GraphQL API](https://hive-platform-docs.theguild.workers.dev/docs/api-reference/graphql-api/member-management.md): Learn how to manage organization members via the Hive Console GraphQL API.
+- [Project Management via the GraphQL API](https://hive-platform-docs.theguild.workers.dev/docs/api-reference/graphql-api/project-management.md): Learn how to manage projects via the Hive Console GraphQL API.
+- [Target Management via the GraphQL API](https://hive-platform-docs.theguild.workers.dev/docs/api-reference/graphql-api/target-management.md): Learn how to manage targets via the Hive Console GraphQL API.
+- [Lookup Unused and Deprecated Schema Parts via the GraphQL API](https://hive-platform-docs.theguild.workers.dev/docs/api-reference/graphql-api/unused-deprecated-schema.md): Learn how to lookup unused and deprecated schema parts via the Hive Console GraphQL API.
+- [Hive GraphQL Federated Link Specifications](https://hive-platform-docs.theguild.workers.dev/docs/api-reference/link-specifications.md)
+- [Hive PHP Client](https://hive-platform-docs.theguild.workers.dev/docs/api-reference/php-client.md)
+- [Hive Ruby Client](https://hive-platform-docs.theguild.workers.dev/docs/api-reference/ruby-client.md)
+- [Hive Rust Client](https://hive-platform-docs.theguild.workers.dev/docs/api-reference/rust-client.md)
+- [Usage Report JSON Schema / Specification](https://hive-platform-docs.theguild.workers.dev/docs/api-reference/usage-reports.md): Hive Usage Report JSON Schema / Specification
+- [Authorization and Authentication](https://hive-platform-docs.theguild.workers.dev/docs/gateway/authorization-authentication.md)
+- [Concurrency & Scaling](https://hive-platform-docs.theguild.workers.dev/docs/gateway/concurrency-and-scaling.md): Learn how to scale Hive Gateway using Node.js cluster forking or Bun to handle more concurrent HTTP requests, and how to plan memory and CPU resources accordingly.
+- [Defer and Stream](https://hive-platform-docs.theguild.workers.dev/docs/gateway/defer-stream.md): Stream and defer are directives that allow you to improve latency for clients by sending the most important data as soon as it's ready.
+- [Docker](https://hive-platform-docs.theguild.workers.dev/docs/gateway/deployment/docker.md)
+- [Run Anywhere - Deploy your Gateway](https://hive-platform-docs.theguild.workers.dev/docs/gateway/deployment.md)
+- [Integration with Express](https://hive-platform-docs.theguild.workers.dev/docs/gateway/deployment/node-frameworks/express.md): Express is the most popular web framework for Node.js. It is a minimalist framework that provides a robust set of features to handle HTTP on Node.js applications.
+- [Integration with Fastify](https://hive-platform-docs.theguild.workers.dev/docs/gateway/deployment/node-frameworks/fastify.md): Fastify is one of the popular HTTP server frameworks for Node.js. It is a very simple, yet powerful framework that is easy to learn and use.
+- [Integration with Hapi](https://hive-platform-docs.theguild.workers.dev/docs/gateway/deployment/node-frameworks/hapi.md)
+- [Integration with Koa](https://hive-platform-docs.theguild.workers.dev/docs/gateway/deployment/node-frameworks/koa.md): Koa is a new web framework designed by the team behind Express, which aims to be a smaller, more expressive, and more robust foundation for web applications and APIs.
+- [Integration with NestJS](https://hive-platform-docs.theguild.workers.dev/docs/gateway/deployment/node-frameworks/nestjs.md): Hive Gateway Driver for Nest (Nest JS) is a Node.js framework for building server-side applications.
+- [Integration with Next.js](https://hive-platform-docs.theguild.workers.dev/docs/gateway/deployment/node-frameworks/nextjs.md): Next.js is a web framework that allows you to build websites very quickly and Hive Gateway can be integrated with Next.js easily as an API Route.
+- [Integration with SvelteKit](https://hive-platform-docs.theguild.workers.dev/docs/gateway/deployment/node-frameworks/sveltekit.md): SvelteKit is a framework for rapidly developing robust, performant web applications using Svelte.
+- [Integration with µWebSockets.js](https://hive-platform-docs.theguild.workers.dev/docs/gateway/deployment/node-frameworks/uwebsockets.md): µWebSockets.js is an HTTP/WebSocket server for Node.js.
+- [Resources Requirements](https://hive-platform-docs.theguild.workers.dev/docs/gateway/deployment/resources-requirements.md)
+- [Integration with Bun](https://hive-platform-docs.theguild.workers.dev/docs/gateway/deployment/runtimes/bun.md): Hive Gateway provides you a cross-platform GraphQL Server. So you can easily integrate it into any platform besides Node.js.
+- [Integration with Deno](https://hive-platform-docs.theguild.workers.dev/docs/gateway/deployment/runtimes/deno.md): Hive Gateway provides you a cross-platform GraphQL Server. So you can easily integrate it into any platform besides Node.js.
+- [Node.js](https://hive-platform-docs.theguild.workers.dev/docs/gateway/deployment/runtimes/nodejs.md)
+- [Deploying Hive Gateway to AWS Lambda](https://hive-platform-docs.theguild.workers.dev/docs/gateway/deployment/serverless/aws-lambda.md)
+- [Deploying Hive Gateway to Azure Functions](https://hive-platform-docs.theguild.workers.dev/docs/gateway/deployment/serverless/azure-functions.md)
+- [Deploying Hive Gateway to Cloudflare Workers](https://hive-platform-docs.theguild.workers.dev/docs/gateway/deployment/serverless/cloudflare-workers.md)
+- [Deploying Hive Gateway to Google Cloud Platform](https://hive-platform-docs.theguild.workers.dev/docs/gateway/deployment/serverless/google-cloud-platform.md): Google Cloud Platform (GCP) is a suite of cloud computing services powered by Google. It is easy to use Hive Gateway with GCP.
+- [Serverless / On the Edge](https://hive-platform-docs.theguild.workers.dev/docs/gateway/deployment/serverless.md)
+- [GraphQL Gateway](https://hive-platform-docs.theguild.workers.dev/docs/gateway.md): Hive Gateway is the GraphQL federation Gateway and/or Proxy Gateway for your GraphQL services.
+- [Logging & Error Handling](https://hive-platform-docs.theguild.workers.dev/docs/gateway/logging-and-error-handling.md): Learn how to log information about the Gateway's lifecycle, errors, and other events. Also, learn how to handle errors and mask them to prevent leaking sensitive information to the client.
+- [Monitoring and Tracing](https://hive-platform-docs.theguild.workers.dev/docs/gateway/monitoring-tracing.md): Monitoring and tracing are essential for debugging and understanding the performance and overall behavior of your Hive Gateway.
+- [Custom Plugins](https://hive-platform-docs.theguild.workers.dev/docs/gateway/other-features/custom-plugins.md): Add feature or third party integrations with Hive Gateway plugin system.
+- [Header Propagation](https://hive-platform-docs.theguild.workers.dev/docs/gateway/other-features/header-propagation.md)
+- [Extend Your Gateway](https://hive-platform-docs.theguild.workers.dev/docs/gateway/other-features.md): Extend the capabilities of your GraphQL API such as rate limiting, caching, and more.
+- [Automatic Persisted Queries](https://hive-platform-docs.theguild.workers.dev/docs/gateway/other-features/performance/automatic-persisted-queries.md): Automatic Persisted Queries is a protocol for reducing the overhead of sending the same GraphQL documents to the server over and over again.
+- [Compression in HTTP](https://hive-platform-docs.theguild.workers.dev/docs/gateway/other-features/performance/compression.md)
+- [Connection Pooling](https://hive-platform-docs.theguild.workers.dev/docs/gateway/other-features/performance/connection-pooling.md)
+- [Deduplicate Inflight Requests](https://hive-platform-docs.theguild.workers.dev/docs/gateway/other-features/performance/deduplicate-inflight-requests.md)
+- [Execution Cancellation](https://hive-platform-docs.theguild.workers.dev/docs/gateway/other-features/performance/execution-cancellation.md)
+- [HTTP caching](https://hive-platform-docs.theguild.workers.dev/docs/gateway/other-features/performance/http-caching.md)
+- [Performance & Caching](https://hive-platform-docs.theguild.workers.dev/docs/gateway/other-features/performance.md): Performance is a critical aspect of any application. Hive Gateway Runtime provides a set of features to help you optimize the performance of your gateway.
+- [Parsing & Validation Caching](https://hive-platform-docs.theguild.workers.dev/docs/gateway/other-features/performance/parsing-and-validation-caching.md)
+- [Request Batching](https://hive-platform-docs.theguild.workers.dev/docs/gateway/other-features/performance/request-batching.md): Request Batching is the process of taking a group of requests, combining them into one, and making a single request with the same data that all of the other queries would have made.
+- [Response Caching](https://hive-platform-docs.theguild.workers.dev/docs/gateway/other-features/performance/response-caching.md)
+- [Upstream Cancellation](https://hive-platform-docs.theguild.workers.dev/docs/gateway/other-features/performance/upstream-cancellation.md)
+- [Progressive Override](https://hive-platform-docs.theguild.workers.dev/docs/gateway/other-features/progressive-override.md)
+- [Rust Query Planner](https://hive-platform-docs.theguild.workers.dev/docs/gateway/other-features/rust-query-planner.md)
+- [Audit Documents](https://hive-platform-docs.theguild.workers.dev/docs/gateway/other-features/security/audit-documents.md)
+- [AWS Signature Version 4 (SigV4)](https://hive-platform-docs.theguild.workers.dev/docs/gateway/other-features/security/aws-sigv4.md)
+- [Block Field Suggestions](https://hive-platform-docs.theguild.workers.dev/docs/gateway/other-features/security/block-field-suggestions.md)
+- [Character Limit Plugin](https://hive-platform-docs.theguild.workers.dev/docs/gateway/other-features/security/character-limit.md)
+- [CORS](https://hive-platform-docs.theguild.workers.dev/docs/gateway/other-features/security/cors.md): CORS stands for Cross Origin Resource Sharing. In a nutshell, as a security measure, browsers aren't allowed to access resources outside their own domain.
+- [CSRF Prevention](https://hive-platform-docs.theguild.workers.dev/docs/gateway/other-features/security/csrf-prevention.md): If you have CORS enabled, almost all requests coming from the browser will have a preflight request - however, some requests are deemed "simple" and don't make a preflight.
+- [Demand Control / Cost Limit](https://hive-platform-docs.theguild.workers.dev/docs/gateway/other-features/security/demand-control.md)
+- [Disable Introspection](https://hive-platform-docs.theguild.workers.dev/docs/gateway/other-features/security/disable-introspection.md): Learn how to disable GraphQL schema introspection and the "did you mean x" suggestion feature.
+- [HMAC Signature](https://hive-platform-docs.theguild.workers.dev/docs/gateway/other-features/security/hmac-signature.md)
+- [Secure HTTP Connection (HTTPS)](https://hive-platform-docs.theguild.workers.dev/docs/gateway/other-features/security/https.md)
+- [Secure your Gateway](https://hive-platform-docs.theguild.workers.dev/docs/gateway/other-features/security.md)
+- [Max Aliases](https://hive-platform-docs.theguild.workers.dev/docs/gateway/other-features/security/max-aliases.md)
+- [Max Depth](https://hive-platform-docs.theguild.workers.dev/docs/gateway/other-features/security/max-depth.md)
+- [Max Directives](https://hive-platform-docs.theguild.workers.dev/docs/gateway/other-features/security/max-directives.md)
+- [Max Tokens](https://hive-platform-docs.theguild.workers.dev/docs/gateway/other-features/security/max-tokens.md)
+- [Rate Limiting](https://hive-platform-docs.theguild.workers.dev/docs/gateway/other-features/security/rate-limiting.md): Learn how to protect your Hive Gateway from abuse by configuring field-level rate limiting, using either programmatic configuration or the @rateLimit directive in your subgraph schema.
+- [Debugging](https://hive-platform-docs.theguild.workers.dev/docs/gateway/other-features/testing/debugging.md)
+- [Gateway Tester](https://hive-platform-docs.theguild.workers.dev/docs/gateway/other-features/testing/gateway-tester.md)
+- [Testing & Debugging](https://hive-platform-docs.theguild.workers.dev/docs/gateway/other-features/testing.md)
+- [Mocking your GraphQL API](https://hive-platform-docs.theguild.workers.dev/docs/gateway/other-features/testing/mocking.md)
+- [Snapshot Plugin](https://hive-platform-docs.theguild.workers.dev/docs/gateway/other-features/testing/snapshot.md)
+- [Upstream reliability](https://hive-platform-docs.theguild.workers.dev/docs/gateway/other-features/upstream-reliability.md): Improve reliability of Hive Gateway with timeout and retry policy for upstream requests
+- [Gateway: Persisted Documents / Operations](https://hive-platform-docs.theguild.workers.dev/docs/gateway/persisted-documents.md)
+- [Gateway: GraphQL Subscriptions](https://hive-platform-docs.theguild.workers.dev/docs/gateway/subscriptions.md)
+- [Gateway: Supergraph schema](https://hive-platform-docs.theguild.workers.dev/docs/gateway/supergraph-proxy-source.md)
+- [Usage Reporting](https://hive-platform-docs.theguild.workers.dev/docs/gateway/usage-reporting.md)
+- [Introduction to Hive](https://hive-platform-docs.theguild.workers.dev/docs.md)
+- [Child Loggers](https://hive-platform-docs.theguild.workers.dev/docs/logger/child-loggers.md)
+- [Hive Logger](https://hive-platform-docs.theguild.workers.dev/docs/logger.md)
+- [Log Levels](https://hive-platform-docs.theguild.workers.dev/docs/logger/log-levels.md)
+- [Logging Methods](https://hive-platform-docs.theguild.workers.dev/docs/logger/logging-methods.md)
+- [Redacting Sensitive Information](https://hive-platform-docs.theguild.workers.dev/docs/logger/redacting.md)
+- [Advanced Serialization](https://hive-platform-docs.theguild.workers.dev/docs/logger/serialization.md)
+- [Writers](https://hive-platform-docs.theguild.workers.dev/docs/logger/writers.md)
+- [Migrating Hive Gateway from v1 to v2](https://hive-platform-docs.theguild.workers.dev/docs/migration-guides/gateway-v1-v2.md)
+- [Moving from Registry Access Tokens to Access Tokens](https://hive-platform-docs.theguild.workers.dev/docs/migration-guides/organization-access-tokens.md)
+- [Collections](https://hive-platform-docs.theguild.workers.dev/docs/new-laboratory/collections.md)
+- [Environment Variables](https://hive-platform-docs.theguild.workers.dev/docs/new-laboratory/environment-variables.md)
+- [History](https://hive-platform-docs.theguild.workers.dev/docs/new-laboratory/history.md)
+- [Laboratory](https://hive-platform-docs.theguild.workers.dev/docs/new-laboratory.md)
+- [Operations](https://hive-platform-docs.theguild.workers.dev/docs/new-laboratory/operations.md)
+- [Preflight Scripts](https://hive-platform-docs.theguild.workers.dev/docs/new-laboratory/preflight.md)
+- [Schema Support](https://hive-platform-docs.theguild.workers.dev/docs/new-laboratory/schema-support.md)
+- [Apollo Gateway](https://hive-platform-docs.theguild.workers.dev/docs/other-integrations/apollo-gateway.md)
+- [Apollo Router](https://hive-platform-docs.theguild.workers.dev/docs/other-integrations/apollo-router.md)
+- [Apollo-Server](https://hive-platform-docs.theguild.workers.dev/docs/other-integrations/apollo-server.md)
+- [CI/CD and Hive CLI](https://hive-platform-docs.theguild.workers.dev/docs/other-integrations/ci-cd.md)
+- [Code-First Approach and Hive CLI](https://hive-platform-docs.theguild.workers.dev/docs/other-integrations/code-first.md)
+- [Envelop](https://hive-platform-docs.theguild.workers.dev/docs/other-integrations/envelop.md)
+- [GQLGen (GoLang)](https://hive-platform-docs.theguild.workers.dev/docs/other-integrations/gqlgen-go.md)
+- [Grafbase Gateway](https://hive-platform-docs.theguild.workers.dev/docs/other-integrations/grafbase-gateway.md)
+- [GraphQL Code Generator](https://hive-platform-docs.theguild.workers.dev/docs/other-integrations/graphql-code-generator.md)
+- [GraphQL-Ruby](https://hive-platform-docs.theguild.workers.dev/docs/other-integrations/graphql-ruby.md)
+- [GraphQL-Yoga](https://hive-platform-docs.theguild.workers.dev/docs/other-integrations/graphql-yoga.md)
+- [Hive Integrations](https://hive-platform-docs.theguild.workers.dev/docs/other-integrations.md)
+- [Lighthouse (Laravel)](https://hive-platform-docs.theguild.workers.dev/docs/other-integrations/lighthouse.md)
+- [Schema-Stitching](https://hive-platform-docs.theguild.workers.dev/docs/other-integrations/schema-stitching.md)
+- [Compatibility](https://hive-platform-docs.theguild.workers.dev/docs/router/compatibility.md)
+- [authorization](https://hive-platform-docs.theguild.workers.dev/docs/router/configuration/authorization.md)
+- [coprocessor](https://hive-platform-docs.theguild.workers.dev/docs/router/configuration/coprocessor.md)
+- [cors](https://hive-platform-docs.theguild.workers.dev/docs/router/configuration/cors.md)
+- [csrf](https://hive-platform-docs.theguild.workers.dev/docs/router/configuration/csrf.md)
+- [demand_control](https://hive-platform-docs.theguild.workers.dev/docs/router/configuration/demand_control.md)
+- [Environment Variables](https://hive-platform-docs.theguild.workers.dev/docs/router/configuration/environment-variables.md)
+- [error_masking](https://hive-platform-docs.theguild.workers.dev/docs/router/configuration/error_masking.md)
+- [Expressions](https://hive-platform-docs.theguild.workers.dev/docs/router/configuration/expressions.md)
+- [headers](https://hive-platform-docs.theguild.workers.dev/docs/router/configuration/headers.md)
+- [http](https://hive-platform-docs.theguild.workers.dev/docs/router/configuration/http.md)
+- [Configuration reference](https://hive-platform-docs.theguild.workers.dev/docs/router/configuration.md)
+- [introspection](https://hive-platform-docs.theguild.workers.dev/docs/router/configuration/introspection.md)
+- [jwt](https://hive-platform-docs.theguild.workers.dev/docs/router/configuration/jwt.md)
+- [laboratory](https://hive-platform-docs.theguild.workers.dev/docs/router/configuration/laboratory.md)
+- [limits](https://hive-platform-docs.theguild.workers.dev/docs/router/configuration/limits.md)
+- [log](https://hive-platform-docs.theguild.workers.dev/docs/router/configuration/log.md)
+- [override_labels](https://hive-platform-docs.theguild.workers.dev/docs/router/configuration/override_labels.md)
+- [override_subgraph_urls](https://hive-platform-docs.theguild.workers.dev/docs/router/configuration/override_subgraph_urls.md)
+- [persisted_documents](https://hive-platform-docs.theguild.workers.dev/docs/router/configuration/persisted_documents.md)
+- [query_planner](https://hive-platform-docs.theguild.workers.dev/docs/router/configuration/query_planner.md)
+- [response_extensions](https://hive-platform-docs.theguild.workers.dev/docs/router/configuration/response_extensions.md)
+- [storages](https://hive-platform-docs.theguild.workers.dev/docs/router/configuration/storages.md)
+- [subscriptions](https://hive-platform-docs.theguild.workers.dev/docs/router/configuration/subscriptions.md)
+- [supergraph](https://hive-platform-docs.theguild.workers.dev/docs/router/configuration/supergraph.md)
+- [telemetry](https://hive-platform-docs.theguild.workers.dev/docs/router/configuration/telemetry.md)
+- [traffic_shaping](https://hive-platform-docs.theguild.workers.dev/docs/router/configuration/traffic_shaping.md)
+- [Introduction](https://hive-platform-docs.theguild.workers.dev/docs/router/customizations/coprocessors.md)
+- [Stages and Protocol](https://hive-platform-docs.theguild.workers.dev/docs/router/customizations/coprocessors/stages-and-protocol.md)
+- [Usage](https://hive-platform-docs.theguild.workers.dev/docs/router/customizations/coprocessors/usage.md)
+- [Overview](https://hive-platform-docs.theguild.workers.dev/docs/router/customizations.md)
+- [Execution and Lifecycle](https://hive-platform-docs.theguild.workers.dev/docs/router/customizations/plugin-system/execution-and-lifecycle.md)
+- [Hooks](https://hive-platform-docs.theguild.workers.dev/docs/router/customizations/plugin-system/hooks.md)
+- [Introduction](https://hive-platform-docs.theguild.workers.dev/docs/router/customizations/plugin-system.md)
+- [Usage](https://hive-platform-docs.theguild.workers.dev/docs/router/customizations/plugin-system/usage.md)
+- [Getting Started](https://hive-platform-docs.theguild.workers.dev/docs/router/getting-started.md)
+- [Dynamic Subgraph Routing](https://hive-platform-docs.theguild.workers.dev/docs/router/guides/dynamic-subgraph-routing.md)
+- [Header Manipulation](https://hive-platform-docs.theguild.workers.dev/docs/router/guides/header-manipulation.md)
+- [Performance Tuning & Traffic Shaping](https://hive-platform-docs.theguild.workers.dev/docs/router/guides/performance-tuning.md)
+- [Introduction](https://hive-platform-docs.theguild.workers.dev/docs/router.md)
+- [Logging](https://hive-platform-docs.theguild.workers.dev/docs/router/observability/logging.md)
+- [OpenTelemetry Metrics](https://hive-platform-docs.theguild.workers.dev/docs/router/observability/metrics.md)
+- [Probes](https://hive-platform-docs.theguild.workers.dev/docs/router/observability/probes.md)
+- [OpenTelemetry Tracing](https://hive-platform-docs.theguild.workers.dev/docs/router/observability/tracing.md)
+- [Usage Reporting](https://hive-platform-docs.theguild.workers.dev/docs/router/observability/usage_reporting.md)
+- [Authorization](https://hive-platform-docs.theguild.workers.dev/docs/router/security/authorization.md)
+- [Configuring CORS](https://hive-platform-docs.theguild.workers.dev/docs/router/security/cors.md)
+- [CSRF Prevention](https://hive-platform-docs.theguild.workers.dev/docs/router/security/csrf.md)
+- [Demand Control](https://hive-platform-docs.theguild.workers.dev/docs/router/security/demand-control.md)
+- [Subgraph Error Masking](https://hive-platform-docs.theguild.workers.dev/docs/router/security/error-masking.md)
+- [Introspection](https://hive-platform-docs.theguild.workers.dev/docs/router/security/introspection.md)
+- [JWT Authentication](https://hive-platform-docs.theguild.workers.dev/docs/router/security/jwt-authentication.md)
+- [Operation Complexity](https://hive-platform-docs.theguild.workers.dev/docs/router/security/operation-complexity.md)
+- [Persisted Documents](https://hive-platform-docs.theguild.workers.dev/docs/router/security/persisted-documents.md)
+- [TLS & mTLS](https://hive-platform-docs.theguild.workers.dev/docs/router/security/tls.md)
+- [HTTP Callback](https://hive-platform-docs.theguild.workers.dev/docs/router/subscriptions/http-callback.md): Use the HTTP Callback protocol for GraphQL subscriptions with Hive Router, for router-to-subgraph communication.
+- [Incremental Delivery over HTTP](https://hive-platform-docs.theguild.workers.dev/docs/router/subscriptions/incremental-delivery.md): Use Incremental Delivery over HTTP for GraphQL subscriptions with Hive Router, based on the official GraphQL over HTTP spec RFC.
+- [Overview](https://hive-platform-docs.theguild.workers.dev/docs/router/subscriptions.md): How Hive Router handles federated GraphQL subscriptions, supported protocols, protocol negotiation, and configuration.
+- [Multipart HTTP](https://hive-platform-docs.theguild.workers.dev/docs/router/subscriptions/multipart-http.md): Use Apollo's Multipart HTTP protocol for GraphQL subscriptions with Hive Router, for both client-to-router and router-to-subgraph communication.
+- [Server-Sent Events (SSE)](https://hive-platform-docs.theguild.workers.dev/docs/router/subscriptions/sse.md): Use Server-Sent Events (SSE) for GraphQL subscriptions with Hive Router, for both client-to-router and router-to-subgraph communication.
+- [WebSockets](https://hive-platform-docs.theguild.workers.dev/docs/router/subscriptions/websockets.md): Use the GraphQL over WebSocket protocol with Hive Router for real-time subscriptions, for both client-to-router and router-to-subgraph communication.
+- [Supergraph](https://hive-platform-docs.theguild.workers.dev/docs/router/supergraph.md)
+- [App Deployment (Persisted Operations)](https://hive-platform-docs.theguild.workers.dev/docs/schema-registry/app-deployments.md)
+- [Schema Contracts](https://hive-platform-docs.theguild.workers.dev/docs/schema-registry/contracts.md)
+- [Contributing to Hive Console](https://hive-platform-docs.theguild.workers.dev/docs/schema-registry/contributing.md)
+- [Schema Explorer](https://hive-platform-docs.theguild.workers.dev/docs/schema-registry/explorer.md)
+- [External Schema Composition](https://hive-platform-docs.theguild.workers.dev/docs/schema-registry/external-schema-composition.md)
+- [Get started with GraphQL Federation](https://hive-platform-docs.theguild.workers.dev/docs/schema-registry/get-started/apollo-federation.md)
+- [First Steps with Hive Console](https://hive-platform-docs.theguild.workers.dev/docs/schema-registry/get-started/first-steps.md)
+- [Get started with Schema-Stitching](https://hive-platform-docs.theguild.workers.dev/docs/schema-registry/get-started/schema-stitching.md)
+- [Get started with a Single Schema / Monorepo](https://hive-platform-docs.theguild.workers.dev/docs/schema-registry/get-started/single-project.md)
+- [High-Availability CDN](https://hive-platform-docs.theguild.workers.dev/docs/schema-registry/high-availability-cdn.md)
+- [Running with Hive Console in Production: A High-Availability Guide](https://hive-platform-docs.theguild.workers.dev/docs/schema-registry/high-availability-resilience.md)
+- [Introduction](https://hive-platform-docs.theguild.workers.dev/docs/schema-registry.md)
+- [Laboratory](https://hive-platform-docs.theguild.workers.dev/docs/schema-registry/laboratory.md)
+- [Preflight Scripts](https://hive-platform-docs.theguild.workers.dev/docs/schema-registry/laboratory/preflight-scripts.md): Useful for handling authentication flows like OAuth, where you may need to refresh an access token
+- [Access Tokens](https://hive-platform-docs.theguild.workers.dev/docs/schema-registry/management/access-tokens.md)
+- [Audit Logs](https://hive-platform-docs.theguild.workers.dev/docs/schema-registry/management/audit-logs.md)
+- [Member, Roles, and Permissions](https://hive-platform-docs.theguild.workers.dev/docs/schema-registry/management/members-roles-permissions.md)
+- [Organization Management](https://hive-platform-docs.theguild.workers.dev/docs/schema-registry/management/organizations.md)
+- [Project Management](https://hive-platform-docs.theguild.workers.dev/docs/schema-registry/management/projects.md)
+- [Single Sign On via OIDC (Open ID Connect Provider)](https://hive-platform-docs.theguild.workers.dev/docs/schema-registry/management/sso-oidc-provider.md)
+- [Target Management](https://hive-platform-docs.theguild.workers.dev/docs/schema-registry/management/targets.md)
+- [Metric Alerts](https://hive-platform-docs.theguild.workers.dev/docs/schema-registry/metric-alerts.md)
+- [Schema Policies (linting)](https://hive-platform-docs.theguild.workers.dev/docs/schema-registry/schema-policy.md)
+- [CDN Artifacts](https://hive-platform-docs.theguild.workers.dev/docs/schema-registry/self-hosting/cdn-artifacts.md)
+- [Self-hosting Changelog](https://hive-platform-docs.theguild.workers.dev/docs/schema-registry/self-hosting/changelog.md)
+- [Client & CLI Configuration](https://hive-platform-docs.theguild.workers.dev/docs/schema-registry/self-hosting/client-and-cli-configuration.md)
+- [External Composition](https://hive-platform-docs.theguild.workers.dev/docs/schema-registry/self-hosting/external-composition.md)
+- [Self-Hosting Hive Console](https://hive-platform-docs.theguild.workers.dev/docs/schema-registry/self-hosting/get-started.md)
+- [OIDC Login](https://hive-platform-docs.theguild.workers.dev/docs/schema-registry/self-hosting/oidc-login.md)
+- [S3 Storage Provider](https://hive-platform-docs.theguild.workers.dev/docs/schema-registry/self-hosting/s3-provider.md)
+- [Telemetry / Error Handling](https://hive-platform-docs.theguild.workers.dev/docs/schema-registry/self-hosting/telemetry.md)
+- [Troubleshooting](https://hive-platform-docs.theguild.workers.dev/docs/schema-registry/self-hosting/troubleshooting.md)
+- [GraphQL Schema Usage Insights](https://hive-platform-docs.theguild.workers.dev/docs/schema-registry/usage-reporting.md)
+- [Open Source Alternative to Apollo GraphOS](https://hive-platform-docs.theguild.workers.dev/docs/use-cases/apollo-graphos.md): Hive is an open source drop-in replacement for Apollo GraphOS with no vendor lock-in. Managed and 100% on-premise options.

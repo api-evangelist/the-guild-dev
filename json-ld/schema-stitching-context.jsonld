@@ -1,0 +1,68 @@
+{
+  "@context": {
+    "@vocab": "https://schema.org/",
+    "stitching": "https://the-guild.dev/graphql/stitching/vocab#",
+    "graphql": "https://graphql.org/vocab#",
+
+    "SchemaStitching": "stitching:SchemaStitching",
+    "Subschema": "stitching:Subschema",
+    "TypeMerging": "stitching:TypeMerging",
+    "SchemaGateway": "stitching:SchemaGateway",
+    "StitchingDirective": "stitching:StitchingDirective",
+    "SchemaDelegation": "stitching:SchemaDelegation",
+    "SchemaTransform": "stitching:SchemaTransform",
+
+    "GraphQLSchema": "graphql:Schema",
+    "GraphQLType": "graphql:Type",
+    "GraphQLQuery": "graphql:Query",
+    "GraphQLMutation": "graphql:Mutation",
+    "GraphQLSubscription": "graphql:Subscription",
+    "GraphQLResolver": "graphql:Resolver",
+
+    "name": "schema:name",
+    "description": "schema:description",
+    "url": "schema:url",
+    "version": "schema:version",
+    "codeRepository": "schema:codeRepository",
+    "documentation": "schema:documentation",
+    "license": "schema:license",
+    "programmingLanguage": "schema:programmingLanguage",
+
+    "hasSubschema": {
+      "@id": "stitching:hasSubschema",
+      "@type": "@id"
+    },
+    "mergesType": {
+      "@id": "stitching:mergesType",
+      "@type": "@id"
+    },
+    "delegatesTo": {
+      "@id": "stitching:delegatesTo",
+      "@type": "@id"
+    },
+    "selectionSet": "stitching:selectionSet",
+    "mergeKey": "stitching:mergeKey",
+    "batchEnabled": "stitching:batchEnabled",
+    "transformApplied": {
+      "@id": "stitching:transformApplied",
+      "@type": "@id"
+    },
+
+    "SoftwareApplication": "schema:SoftwareApplication",
+    "SoftwareSourceCode": "schema:SoftwareSourceCode",
+    "APIReference": "schema:APIReference",
+    "TechArticle": "schema:TechArticle"
+  },
+  "@graph": [
+    {
+      "@id": "https://the-guild.dev/graphql/stitching",
+      "@type": ["SoftwareApplication", "SchemaGateway"],
+      "name": "Schema Stitching",
+      "description": "A GraphQL technique for combining multiple GraphQL schemas into a single unified API gateway using type merging and schema delegation.",
+      "url": "https://the-guild.dev/graphql/stitching",
+      "documentation": "https://the-guild.dev/graphql/stitching/docs",
+      "codeRepository": "https://github.com/ardatan/graphql-tools",
+      "programmingLanguage": "TypeScript"
+    }
+  ]
+}

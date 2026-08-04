@@ -1,0 +1,148 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://schema-stitching.dev/schema-stitching-config-schema.json",
+  "title": "Schema Stitching Configuration",
+  "description": "JSON Schema for configuring a GraphQL schema stitching gateway, defining subschemas, type merging, and field delegation.",
+  "type": "object",
+  "properties": {
+    "subschemas": {
+      "type": "array",
+      "description": "Array of subschemas to stitch together into a unified gateway schema.",
+      "items": {
+        "$ref": "#/definitions/SubschemaConfig"
+      }
+    },
+    "typeDefs": {
+      "type": "string",
+      "description": "Additional GraphQL type definitions to extend the stitched schema with extra fields or types."
+    },
+    "resolvers": {
+      "type": "object",
+      "description": "Additional resolver functions for types and fields added via typeDefs.",
+      "additionalProperties": true
+    },
+    "mergeTypes": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether to automatically merge types with the same name across subschemas."
+    }
+  },
+  "definitions": {
+    "SubschemaConfig": {
+      "type": "object",
+      "required": ["schema"],
+      "properties": {
+        "schema": {
+          "type": "string",
+          "description": "The GraphQL schema SDL string or reference to a remote schema."
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL of the remote GraphQL service endpoint."
+        },
+        "batch": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether to batch queries to this subschema using DataLoader-style batching."
+        },
+        "merge": {
+          "type": "object",
+          "description": "Type merging configuration for this subschema.",
+          "additionalProperties": {
+            "$ref": "#/definitions/MergeTypeConfig"
+          }
+        },
+        "transforms": {
+          "type": "array",
+          "description": "Schema transforms to apply to this subschema before stitching.",
+          "items": {
+            "$ref": "#/definitions/SchemaTransform"
+          }
+        },
+        "executor": {
+          "type": "string",
+          "description": "Custom executor function name for this subschema."
+        }
+      }
+    },
+    "MergeTypeConfig": {
+      "type": "object",
+      "properties": {
+        "selectionSet": {
+          "type": "string",
+          "description": "GraphQL selection set for fetching the key fields required to merge this type.",
+          "example": "{ id }"
+        },
+        "fieldName": {
+          "type": "string",
+          "description": "The query field name used to fetch a single merged type by key."
+        },
+        "argsFromKeys": {
+          "type": "string",
+          "description": "Function expression mapping key values to query arguments."
+        },
+        "key": {
+          "type": "string",
+          "description": "Function expression extracting the merge key from a type object."
+        },
+        "dataLoaderOptions": {
+          "type": "object",
+          "description": "DataLoader configuration for batched type merging.",
+          "properties": {
+            "maxBatchSize": {
+              "type": "integer",
+              "description": "Maximum number of keys per batch request."
+            }
+          }
+        }
+      }
+    },
+    "SchemaTransform": {
+      "type": "object",
+      "description": "A schema transformation to apply to a subschema.",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "FilterRootFields",
+            "FilterObjectFields",
+            "RenameTypes",
+            "RenameRootFields",
+            "RenameObjectFields",
+            "WrapQuery",
+            "HoistField",
+            "PruneSchema"
+          ],
+          "description": "The type of transformation to apply."
+        },
+        "config": {
+          "type": "object",
+          "description": "Configuration specific to the transform type.",
+          "additionalProperties": true
+        }
+      }
+    },
+    "StitchingDirectivesConfig": {
+      "type": "object",
+      "description": "Configuration for stitching directives SDL approach.",
+      "properties": {
+        "keyDirective": {
+          "type": "string",
+          "default": "key",
+          "description": "Name of the directive used to specify merge keys."
+        },
+        "mergeDirective": {
+          "type": "string",
+          "default": "merge",
+          "description": "Name of the directive used to configure type merging."
+        },
+        "computedDirective": {
+          "type": "string",
+          "default": "computed",
+          "description": "Name of the directive used to specify computed fields."
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "title": "Type Merging with Stitching Directives",
+  "description": "Example of using @key and @merge stitching directives to configure type merging in SDL, enabling gateway-reloadable subservice config.",
+  "language": "TypeScript",
+  "package": "@graphql-tools/stitching-directives",
+  "subservice_1": {
+    "name": "Products Service",
+    "sdl": "type Product @key(selectionSet: \"{ id }\") {\n  id: ID!\n  name: String!\n  price: Float!\n}\n\ntype Query {\n  product(id: ID!): Product @merge(keyField: \"id\", keyArg: \"id\")\n  products: [Product!]!\n}"
+  },
+  "subservice_2": {
+    "name": "Inventory Service",
+    "sdl": "type Product @key(selectionSet: \"{ id }\") {\n  id: ID!\n  stock: Int!\n  warehouse: String!\n}\n\ntype Query {\n  productInventory(id: ID!): Product @merge(keyField: \"id\", keyArg: \"id\")\n}"
+  },
+  "gateway_result_type": {
+    "name": "Merged Product",
+    "description": "The gateway automatically merges Product from both subservices",
+    "fields": {
+      "id": "ID! (from both)",
+      "name": "String! (from Products Service)",
+      "price": "Float! (from Products Service)",
+      "stock": "Int! (from Inventory Service)",
+      "warehouse": "String! (from Inventory Service)"
+    }
+  },
+  "input": {
+    "query": "{ products { id name price stock warehouse } }"
+  },
+  "output": {
+    "data": {
+      "products": [
+        { "id": "p1", "name": "Widget Pro", "price": 29.99, "stock": 145, "warehouse": "US-EAST" },
+        { "id": "p2", "name": "Gadget Plus", "price": 59.99, "stock": 0, "warehouse": "US-WEST" }
+      ]
+    }
+  }
+}

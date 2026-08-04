@@ -1,0 +1,450 @@
+"""
+GraphQL Scalars — Full SDL Schema
+Source: https://github.com/graphql-hive/graphql-scalars
+Docs:   https://the-guild.dev/graphql/scalars/docs
+npm:    https://www.npmjs.com/package/graphql-scalars
+
+An open-source library from The Guild providing 80+ production-ready custom
+GraphQL scalar types for building precise, type-safe GraphQL schemas compatible
+with any GraphQL server implementation.
+"""
+
+# ---------------------------------------------------------------------------
+# Date & Time
+# ---------------------------------------------------------------------------
+
+"""
+A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the
+`date-time` format outlined in section 5.6 of the RFC 3339 profile of the
+ISO 8601 standard.
+"""
+scalar DateTime
+
+"""
+A date string, such as 2007-12-03, compliant with the `full-date` format
+outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard.
+"""
+scalar Date
+
+"""
+A time string at UTC, such as 10:15:30Z, compliant with the `full-time` format
+outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard.
+"""
+scalar Time
+
+"""
+A date-time string at UTC with a mandatory timezone offset, such as
+2007-12-03T10:15:30+01:00, compliant with the `date-time` format outlined in
+section 5.6 of the RFC 3339 profile of the ISO 8601 standard.
+"""
+scalar DateTimeISO
+
+"""
+A local date string (i.e., with no associated timezone) in `YYYY-MM-DD` format.
+"""
+scalar LocalDate
+
+"""
+A local time string (i.e., with no associated timezone) in `HH:mm:ss` format.
+"""
+scalar LocalTime
+
+"""
+A local date-time string (i.e., with no associated timezone) in
+`YYYY-MM-DDTHH:mm:ss` format.
+"""
+scalar LocalDateTime
+
+"""
+A string representing a duration conforming to the ISO8601 standard, such as
+P1Y2M3DT4H5M6S, where Y is years, M is months, W is weeks, D is days, H is
+hours, M is minutes, and S is seconds.
+"""
+scalar Duration
+
+"""
+A field whose value is a valid ISO 8601 duration: https://en.wikipedia.org/wiki/ISO_8601#Durations.
+"""
+scalar ISO8601Duration
+
+"""
+A field whose value is a valid UTC Offset: https://en.wikipedia.org/wiki/List_of_UTC_time_offsets
+"""
+scalar UtcOffset
+
+"""
+The javascript `Date` as integer. Type represents date and time as number of
+milliseconds from start of UNIX epoch.
+"""
+scalar Timestamp
+
+# ---------------------------------------------------------------------------
+# Identity & Unique Identifiers
+# ---------------------------------------------------------------------------
+
+"""
+A field whose value is a valid UUID: https://en.wikipedia.org/wiki/Universally_unique_identifier
+"""
+scalar UUID
+
+"""
+A field whose value is a valid GUID (same format as UUID).
+https://en.wikipedia.org/wiki/Universally_unique_identifier
+"""
+scalar GUID
+
+"""
+A field whose value conforms to the standard cuid format as specified in
+https://github.com/ericelliott/cuid
+"""
+scalar Cuid
+
+"""
+A field whose value conforms to the standard cuid2 format as specified in
+https://github.com/paralleldrive/cuid2
+"""
+scalar CUID2
+
+"""
+A field whose value is a ULID: https://github.com/ulid/spec
+"""
+scalar ULID
+
+"""
+A field whose value conforms with the standard mongodb object ID as described
+here: https://docs.mongodb.com/manual/reference/method/ObjectId/
+"""
+scalar ObjectID
+
+"""
+A Decentralized Identifier (DID) as defined by W3C DID spec.
+https://www.w3.org/TR/did-core/
+"""
+scalar DID
+
+# ---------------------------------------------------------------------------
+# Network & Internet
+# ---------------------------------------------------------------------------
+
+"""
+A field whose value is a valid IPv4 address: https://en.wikipedia.org/wiki/IPv4
+"""
+scalar IPv4
+
+"""
+A field whose value is a valid IPv6 address: https://en.wikipedia.org/wiki/IPv6
+"""
+scalar IPv6
+
+"""
+A field whose value is a valid IP address (either IPv4 or IPv6).
+"""
+scalar IP
+
+"""
+A field whose value is a IEEE 802 48-bit MAC address, represented as lower-case
+hexadecimal characters separated by colons.
+"""
+scalar MAC
+
+"""
+A field whose value conforms to the standard URL format as specified in RFC3986:
+https://www.ietf.org/rfc/rfc3986.txt, with the exceptions that:
+- IPs are not allowed as hostnames.
+- Fragments (`#`) are not allowed.
+"""
+scalar URL
+
+"""
+A field whose value is a valid TCP port within the range of 0 to 65535.
+https://en.wikipedia.org/wiki/Transmission_Control_Protocol#TCP_ports
+"""
+scalar Port
+
+# ---------------------------------------------------------------------------
+# Communication
+# ---------------------------------------------------------------------------
+
+"""
+A field whose value conforms to the standard internet email address format as
+specified in HTML Spec: https://html.spec.whatwg.org/multipage/input.html#valid-e-mail-address
+"""
+scalar EmailAddress
+
+"""
+A field whose value conforms to the standard E.164 format as specified in:
+https://en.wikipedia.org/wiki/E.164. Basically this is +17895551234.
+"""
+scalar PhoneNumber
+
+# ---------------------------------------------------------------------------
+# Finance
+# ---------------------------------------------------------------------------
+
+"""
+A field whose value is a valid IBAN (International Bank Account Number):
+https://en.wikipedia.org/wiki/International_Bank_Account_Number
+"""
+scalar IBAN
+
+"""
+A field whose value is a Currency: https://en.wikipedia.org/wiki/ISO_4217
+"""
+scalar Currency
+
+"""
+A field whose value is a valid United States dollar amount represented as a
+string in the format `$<amount>` where amount is a positive decimal number.
+"""
+scalar USCurrency
+
+"""
+A field whose value is a valid ABA routing number for US bank accounts,
+consisting of exactly 9 digits.
+"""
+scalar RoutingNumber
+
+"""
+A field whose value describes a unique financial account number (generic).
+"""
+scalar AccountNumber
+
+# ---------------------------------------------------------------------------
+# Geographic
+# ---------------------------------------------------------------------------
+
+"""
+A field whose value is a valid decimal degrees latitude number (53.471):
+https://en.wikipedia.org/wiki/Latitude
+"""
+scalar Latitude
+
+"""
+A field whose value is a valid decimal degrees longitude number (53.471):
+https://en.wikipedia.org/wiki/Longitude
+"""
+scalar Longitude
+
+"""
+A field whose value is a valid ISO 3166-1 alpha-2 country code:
+https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
+"""
+scalar CountryCode
+
+"""
+A field whose value is a full country name.
+"""
+scalar CountryName
+
+"""
+A field whose value conforms to the standard postal code formats for various
+countries.
+"""
+scalar PostalCode
+
+"""
+A field whose value is a valid IANA Time Zone: https://www.iana.org/time-zones
+"""
+scalar TimeZone
+
+"""
+A field whose value is a valid IETF BCP 47 language tag:
+https://en.wikipedia.org/wiki/IETF_language_tag
+"""
+scalar Locale
+
+# ---------------------------------------------------------------------------
+# Numeric Types
+# ---------------------------------------------------------------------------
+
+"""
+The `BigInt` scalar type represents non-fractional signed whole numeric values.
+BigInt can represent values between -(2^63) + 1 and 2^63 - 1.
+"""
+scalar BigInt
+
+"""
+The `Long` scalar type represents non-fractional signed whole numeric values.
+Long can represent values between -(2^63) and 2^63 - 1.
+"""
+scalar Long
+
+"""
+A field whose value is a number within JavaScript's safe integer range:
+between -(2^53 - 1) and 2^53 - 1.
+"""
+scalar SafeInt
+
+"""
+Integers that will have a value greater than 0.
+"""
+scalar PositiveInt
+
+"""
+Integers that will have a value less than 0.
+"""
+scalar NegativeInt
+
+"""
+Integers that will have a value of 0 or less.
+"""
+scalar NonPositiveInt
+
+"""
+Integers that will have a value of 0 or more.
+"""
+scalar NonNegativeInt
+
+"""
+Floats that will have a value greater than 0.
+"""
+scalar PositiveFloat
+
+"""
+Floats that will have a value less than 0.
+"""
+scalar NegativeFloat
+
+"""
+Floats that will have a value of 0 or less.
+"""
+scalar NonPositiveFloat
+
+"""
+Floats that will have a value of 0 or more.
+"""
+scalar NonNegativeFloat
+
+"""
+A field whose value is an integer between 0 and 2^32 - 1.
+"""
+scalar UnsignedInt
+
+"""
+A field whose value is a non-negative float.
+"""
+scalar UnsignedFloat
+
+"""
+The `Byte` scalar type represents byte value as a Buffer.
+"""
+scalar Byte
+
+# ---------------------------------------------------------------------------
+# Structured Data
+# ---------------------------------------------------------------------------
+
+"""
+The `JSON` scalar type represents JSON values as specified by
+ECMA-404: http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf.
+"""
+scalar JSON
+
+"""
+The `JSONObject` scalar type represents JSON objects as specified by
+ECMA-404: http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf.
+"""
+scalar JSONObject
+
+"""
+A field whose value is a GeoJSON: https://geojson.org/.
+"""
+scalar GeoJSON
+
+# ---------------------------------------------------------------------------
+# Encoding, Tokens & Colors
+# ---------------------------------------------------------------------------
+
+"""
+A field whose value is a JSON Web Token (JWT): https://jwt.io/introduction/.
+"""
+scalar JWT
+
+"""
+A field whose value is a hexadecimal: https://en.wikipedia.org/wiki/Hexadecimal.
+"""
+scalar Hexadecimal
+
+"""
+A field whose value is a hex color code: https://en.wikipedia.org/wiki/Web_colors.
+"""
+scalar HexColorCode
+
+"""
+A field whose value is a CSS RGB color:
+https://developer.mozilla.org/en-US/docs/Web/CSS/color_value#rgb()_and_rgba()
+"""
+scalar RGB
+
+"""
+A field whose value is a CSS RGBA color:
+https://developer.mozilla.org/en-US/docs/Web/CSS/color_value#rgb()_and_rgba()
+"""
+scalar RGBA
+
+"""
+A field whose value is a CSS HSL color:
+https://developer.mozilla.org/en-US/docs/Web/CSS/color_value#hsl()_and_hsla()
+"""
+scalar HSL
+
+"""
+A field whose value is a CSS HSLA color:
+https://developer.mozilla.org/en-US/docs/Web/CSS/color_value#hsl()_and_hsla()
+"""
+scalar HSLA
+
+# ---------------------------------------------------------------------------
+# Text & Strings
+# ---------------------------------------------------------------------------
+
+"""
+A string that cannot be passed as an empty value.
+"""
+scalar NonEmptyString
+
+"""
+A field whose value is a valid regular expression pattern.
+"""
+scalar RegularExpression
+
+# ---------------------------------------------------------------------------
+# Standards & References
+# ---------------------------------------------------------------------------
+
+"""
+A field whose value is a Semantic Version: https://semver.org.
+"""
+scalar SemVer
+
+"""
+A field whose value is a valid ISBN-10 or ISBN-13 number:
+https://en.wikipedia.org/wiki/International_Standard_Book_Number
+"""
+scalar ISBN
+
+"""
+A field whose value is a valid ISSN:
+https://en.wikipedia.org/wiki/International_Standard_Serial_Number
+"""
+scalar ISSN
+
+"""
+A field whose value is a valid Dewey Decimal number.
+"""
+scalar DeweyDecimal
+
+# ---------------------------------------------------------------------------
+# Utility
+# ---------------------------------------------------------------------------
+
+"""
+Represents NULL values. Serialized as null, parsed as null, validated as null.
+"""
+scalar Void
+
+"""
+A field whose value conforms to a Never type: no valid value exists.
+Primarily useful for exhaustiveness checks in union types.
+"""
+scalar Never

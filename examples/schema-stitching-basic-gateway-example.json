@@ -1,0 +1,23 @@
+{
+  "title": "Basic Schema Stitching Gateway",
+  "description": "Example of combining two GraphQL subservices using @graphql-tools/stitch with type merging.",
+  "language": "TypeScript",
+  "package": "@graphql-tools/stitch",
+  "code": "import { stitchSchemas } from '@graphql-tools/stitch';\nimport { buildSchema } from 'graphql';\n\nconst usersSchema = buildSchema(`\n  type User {\n    id: ID!\n    name: String!\n    email: String!\n  }\n  type Query {\n    user(id: ID!): User\n    users: [User!]!\n  }\n`);\n\nconst ordersSchema = buildSchema(`\n  type Order {\n    id: ID!\n    userId: ID!\n    total: Float!\n    status: String!\n  }\n  type Query {\n    order(id: ID!): Order\n    ordersByUser(userId: ID!): [Order!]!\n  }\n`);\n\nconst gatewaySchema = stitchSchemas({\n  subschemas: [\n    { schema: usersSchema },\n    { schema: ordersSchema }\n  ],\n  typeDefs: `\n    extend type User {\n      orders: [Order!]!\n    }\n  `,\n  resolvers: {\n    User: {\n      orders: {\n        selectionSet: '{ id }',\n        resolve(user, _args, context, info) {\n          return delegateToSchema({\n            schema: ordersSchema,\n            operation: 'query',\n            fieldName: 'ordersByUser',\n            args: { userId: user.id },\n            context,\n            info,\n          });\n        }\n      }\n    }\n  }\n});",
+  "input": {
+    "query": "{ user(id: \"1\") { id name email orders { id total status } } }"
+  },
+  "output": {
+    "data": {
+      "user": {
+        "id": "1",
+        "name": "Alice Smith",
+        "email": "alice@example.com",
+        "orders": [
+          { "id": "ord-1", "total": 49.99, "status": "shipped" },
+          { "id": "ord-2", "total": 124.50, "status": "pending" }
+        ]
+      }
+    }
+  }
+}

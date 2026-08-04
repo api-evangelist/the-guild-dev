@@ -1,0 +1,51 @@
+{
+  "title": "Schema Stitching Configuration Structure",
+  "description": "Document structure for configuring a GraphQL schema stitching gateway.",
+  "type": "object",
+  "structure": {
+    "subschemas": {
+      "type": "array",
+      "description": "Array of remote or local GraphQL subschemas to stitch together.",
+      "items": {
+        "schema": "GraphQL schema SDL or executable schema object",
+        "url": "Remote service endpoint URL",
+        "batch": "Enable DataLoader-style batching",
+        "merge": {
+          "TypeName": {
+            "selectionSet": "Key fields selection set e.g. { id }",
+            "fieldName": "Query field to fetch merged type",
+            "argsFromKeys": "Map keys to query args function",
+            "key": "Extract merge key from object function"
+          }
+        },
+        "transforms": "Array of schema transforms (rename, filter, wrap)"
+      }
+    },
+    "typeDefs": "Additional GraphQL SDL type extensions",
+    "resolvers": "Additional resolver implementations",
+    "mergeTypes": "Auto-merge same-named types across subschemas"
+  },
+  "approaches": {
+    "schema_extensions": {
+      "description": "Traditional delegation method using extend keyword in typeDefs",
+      "use_case": "Adding cross-service fields to existing types"
+    },
+    "programmatic_type_merging": {
+      "description": "Code-based configuration of type merging in subschema config",
+      "use_case": "Merging distributed entity types by shared key"
+    },
+    "directive_type_merging": {
+      "description": "SDL-based configuration using @key, @merge, @computed directives",
+      "use_case": "Self-describing subservices with gateway-reloadable config"
+    }
+  },
+  "key_packages": {
+    "@graphql-tools/stitch": "Core schema stitching package",
+    "@graphql-tools/schema": "Schema creation utilities",
+    "@graphql-tools/utils": "Shared utilities",
+    "@graphql-tools/stitching-directives": "Directive-based stitching SDL support",
+    "@graphql-tools/wrap": "Schema wrapping and transforms",
+    "@graphql-tools/delegate": "Schema delegation helpers",
+    "@graphql-tools/batch-execute": "Batched query execution"
+  }
+}

@@ -1,0 +1,956 @@
+"""
+GraphQL Code Generator – Configuration and Plugin Type System
+
+GraphQL Code Generator (https://the-guild.dev/graphql/codegen) is a CLI tool from
+The Guild that generates TypeScript types, resolvers, React hooks, and SDKs from
+GraphQL schemas and operation documents.
+
+This schema documents the tool's internal type system. There is no live GraphQL endpoint;
+types are sourced from:
+  - packages/utils/plugins-helpers/src/types.ts  (Types namespace)
+  - packages/graphql-codegen-cli/src/config.ts   (CodegenConfig alias)
+  - packages/graphql-codegen-core/src/codegen.ts (GenerateOptions consumer)
+
+Primary types modelled here:
+  - CodegenConfig       – root configuration file shape (codegen.yml / codegen.ts)
+  - ConfiguredOutput    – per-output-file configuration block inside `generates`
+  - PluginConfig        – key/value configuration passed to each plugin
+  - TypeScriptPlugin    – configuration for @graphql-codegen/typescript
+  - ResolversPlugin     – configuration for @graphql-codegen/typescript-resolvers
+  - LifecycleHooks      – lifecycle hook definitions
+  - DocumentFile        – loaded GraphQL document representation
+  - CodegenPlugin       – plugin interface (plugin function + optional addToSchema + validate)
+  - GenerateOptions     – internal options passed to the codegen engine per output file
+"""
+
+# ---------------------------------------------------------------------------
+# Scalar declarations
+# ---------------------------------------------------------------------------
+
+"""JSON-serialisable value of any type (String, Boolean, Int, Float, or Object)."""
+scalar JSON
+
+"""Glob pattern string or file path string."""
+scalar GlobPattern
+
+"""A string that starts with a dot and represents a file extension, e.g. `.js`."""
+scalar FileExtension
+
+# ---------------------------------------------------------------------------
+# Enums
+# ---------------------------------------------------------------------------
+
+"""Preset identifiers built into GraphQL Code Generator."""
+enum PresetName {
+  """Client preset – recommended for most new projects."""
+  CLIENT
+  """Near-operation-file preset – one file per operation, co-located with source."""
+  NEAR_OPERATION_FILE
+  """gql-tag-operations preset."""
+  GQL_TAG_OPERATIONS
+  """graphql-modules preset."""
+  GRAPHQL_MODULES
+  """import-types preset."""
+  IMPORT_TYPES
+}
+
+"""How to emit TypeScript declaration kinds."""
+enum DeclarationKind {
+  INTERFACE
+  TYPE
+  CLASS
+  ABSTRACT_CLASS
+}
+
+"""How to inline fragment types in generated output."""
+enum InlineFragmentTypes {
+  """Inline fragment types directly (default)."""
+  INLINE
+  """Combine fragment types into a union."""
+  COMBINE
+  """Mask fragment fields (used with client preset)."""
+  MASK
+}
+
+"""Naming convention styles available via change-case-all."""
+enum NamingConvention {
+  PASCAL_CASE
+  CAMEL_CASE
+  SNAKE_CASE
+  UPPER_CASE
+  KEEP
+}
+
+# ---------------------------------------------------------------------------
+# LifecycleHooks
+# ---------------------------------------------------------------------------
+
+"""
+Lifecycle hook scripts executed by the codegen CLI at specific points.
+Values can be shell command strings. Root-level hooks apply to all outputs;
+output-level hooks apply only to the specific output file and run before the root hook.
+"""
+type LifecycleHooks {
+  """
+  Triggered with no arguments when the codegen starts (after the config file has been parsed).
+  """
+  afterStart: String
+
+  """
+  Triggered with no arguments right before the codegen closes or when watch mode is stopped.
+  """
+  beforeDone: String
+
+  """
+  Triggered every time a file changes during watch mode.
+  Receives two arguments: event type (e.g. 'changed') and file path.
+  """
+  onWatchTriggered: String
+
+  """
+  Triggered in case of a general error in the codegen. The argument is a string containing the error.
+  """
+  onError: String
+
+  """
+  Triggered after a single file is written to the file-system.
+  Receives the path for the written file. Useful for Prettier / linter integration.
+  Not triggered if file content has not changed since last execution.
+  """
+  afterOneFileWrite: String
+
+  """
+  Executed after all files have been written to the file-system.
+  Triggered with multiple arguments – paths for all written files.
+  """
+  afterAllFileWrite: String
+
+  """
+  Triggered before a single file is written.
+  Receives the path and content for the file. Returning a string overrides the file content.
+  Not triggered if file content has not changed since last execution.
+  """
+  beforeOneFileWrite: String
+
+  """
+  Executed after codegen has produced output but before files are written.
+  Triggered with multiple arguments – paths for all relevant files.
+  """
+  beforeAllFileWrite: String
+}
+
+# ---------------------------------------------------------------------------
+# PluckConfig
+# ---------------------------------------------------------------------------
+
+"""
+Configuration for @graphql-tools/graphql-tag-pluck – the tool that extracts
+GraphQL operations from code files (`.ts`, `.tsx`, `.js`, `.jsx`).
+"""
+type PluckModuleEntry {
+  """The NPM package name to look for (e.g. '@apollo/client')."""
+  name: String!
+
+  """
+  The named export identifier to look for within the module.
+  Omit if the tag function is imported as the default export.
+  """
+  identifier: String
+}
+
+type PluckConfig {
+  """
+  Array of package-name / identifier pairs used to track custom gql imports.
+  Use this when your code imports gql from a library other than graphql-tag.
+  """
+  modules: [PluckModuleEntry!]
+
+  """
+  Magic comment pattern that marks inline GraphQL strings.
+  Default: 'GraphQL'  (i.e. the comment /* GraphQL */ )
+  """
+  gqlMagicComment: String
+
+  """Overrides the name of the default GraphQL name identifier."""
+  globalIdentifier: String
+
+  """Allows using a global identifier instead of a module import."""
+  globalGqlIdentifierName: String
+}
+
+# ---------------------------------------------------------------------------
+# SkipDocumentsValidation
+# ---------------------------------------------------------------------------
+
+"""Options controlling GraphQL document validation behaviour."""
+type SkipDocumentsValidationOptions {
+  """
+  Specific validation rule names to ignore.
+  See: https://github.com/graphql/graphql-js/tree/main/src/validation/rules
+  """
+  ignoreRules: [String!]
+
+  """Skip validation for duplicate operation/fragment names."""
+  skipDuplicateValidation: Boolean
+
+  """Skip document validation against the schema entirely."""
+  skipValidationAgainstSchema: Boolean
+}
+
+# ---------------------------------------------------------------------------
+# Schema source options
+# ---------------------------------------------------------------------------
+
+"""Options for loading schema from a remote HTTP endpoint."""
+type UrlSchemaOptions {
+  """Custom HTTP headers sent with the introspection request (e.g. Authorization)."""
+  headers: JSON
+
+  """
+  Module name or file path for a custom fetch implementation.
+  Use when the standard fetch is unavailable or needs to be overridden.
+  """
+  customFetch: String
+
+  """HTTP method for the introspection request. Default: POST."""
+  method: String
+
+  """
+  When true, treat the remote response as SDL rather than JSON introspection.
+  Useful for servers that return SDL directly.
+  """
+  handleAsSDL: Boolean
+}
+
+"""Options for loading schema from a local file or glob pattern."""
+type LocalSchemaPathOptions {
+  """
+  Skip graphql-import syntax and load the file as-is.
+  Default: true
+  """
+  skipGraphQLImport: Boolean
+
+  """
+  Convert GraphQL # comments to descriptions during parsing.
+  Default: false
+  """
+  commentDescriptions: Boolean
+
+  """Assume the SDL is valid and skip validation. Default: false."""
+  assumeValidSDL: Boolean
+
+  """Disable source location tracking in the AST for performance. Default: false."""
+  noLocation: Boolean
+
+  """Allow empty field sets in SDL (legacy). Default: false."""
+  allowLegacySDLEmptyFields: Boolean
+
+  """Allow implemented interfaces without & separator (legacy). Default: false."""
+  allowLegacySDLImplementsInterfaces: Boolean
+
+  """Enable experimental fragment variable definitions. Default: false."""
+  experimentalFragmentVariables: Boolean
+}
+
+"""Options for loading schema from a code file (JS/TS)."""
+type SchemaFromCodeFileOptions {
+  """Do not require() the file to find schema/documents. Default: false."""
+  noRequire: Boolean
+
+  """Do not extract GraphQL AST strings from the file. Default: false."""
+  noPluck: Boolean
+
+  """Skip AST validation when loading. Default: false."""
+  assumeValid: Boolean
+}
+
+"""Options for a custom schema loader."""
+type SchemaWithLoaderOptions {
+  """Path to a custom code file (local or module) that handles schema loading."""
+  loader: String!
+}
+
+# ---------------------------------------------------------------------------
+# Plugin configuration types
+# ---------------------------------------------------------------------------
+
+"""
+Generic plugin configuration bag. Each plugin defines its own accepted keys.
+Represented as a JSON map of key/value pairs.
+"""
+scalar PluginConfig
+
+# ---------------------------------------------------------------------------
+# TypeScript Plugin Configuration
+# ---------------------------------------------------------------------------
+
+"""
+Controls which TypeScript optional (?) modifiers are avoided.
+Can be applied selectively to arguments, input fields, field definitions, or defaults.
+"""
+type AvoidOptionalsConfig {
+  """Avoid optionals on field definitions."""
+  field: Boolean
+  """Avoid optionals on input object fields."""
+  inputValue: Boolean
+  """Avoid optionals on default values."""
+  defaultValue: Boolean
+  """Avoid optionals on query variables."""
+  object: Boolean
+}
+
+"""
+Configuration for the @graphql-codegen/typescript plugin.
+Generates TypeScript types from a GraphQL schema.
+Source: https://the-guild.dev/graphql/codegen/plugins/typescript/typescript
+"""
+type TypeScriptPluginConfig {
+  """
+  Avoid TypeScript optional (?) modifiers on types.
+  Accepts boolean or granular AvoidOptionalsConfig.
+  Default: false
+  """
+  avoidOptionals: Boolean
+
+  """Prefix all generated enum values with const. Default: false."""
+  constEnums: Boolean
+
+  """Generate enums as TypeScript string union types instead of enum declarations. Default: false."""
+  enumsAsTypes: Boolean
+
+  """Preserve numeric enum values from the GraphQL schema. Default: false."""
+  numericEnums: Boolean
+
+  """
+  Add a catch-all entry to future-proof generated enums
+  (e.g. %future added value). Default: false
+  """
+  futureProofEnums: Boolean
+
+  """Add a catch-all entry to future-proof generated union types. Default: false."""
+  futureProofUnions: Boolean
+
+  """Generate enums using TypeScript const assertions. Default: false."""
+  enumsAsConst: Boolean
+
+  """Emit types only for enums; skip all other types. Default: false."""
+  onlyEnums: Boolean
+
+  """Emit types only for operations (enums and scalars). Default: false."""
+  onlyOperationTypes: Boolean
+
+  """Add readonly modifier to all properties and use ReadonlyArray. Default: false."""
+  immutableTypes: Boolean
+
+  """
+  Override the type used for Maybe<T>.
+  Default: T | null
+  """
+  maybeValue: String
+
+  """
+  Override Maybe<T> for input types and arguments.
+  Default: Maybe<T>
+  """
+  inputMaybeValue: String
+
+  """Generate output without the export modifier. Default: false."""
+  noExport: Boolean
+
+  """Disable all description/comment generation. Default: false."""
+  disableDescriptions: Boolean
+
+  """Use implementing types instead of the interface itself. Default: false."""
+  useImplementingTypes: Boolean
+
+  """Wrap field definitions with a FieldWrapper<T> type. Default: false."""
+  wrapFieldDefinitions: Boolean
+
+  """
+  Value for the FieldWrapper type (requires wrapFieldDefinitions: true).
+  Default: T
+  """
+  fieldWrapperValue: String
+
+  """Wrap entire field definitions including Arrays and Maybe wrappers. Default: false."""
+  wrapEntireFieldDefinitions: Boolean
+
+  """
+  Override the EntireFieldWrapper<T> type value.
+  Default: T | Promise<T> | (() => T | Promise<T>)
+  """
+  entireFieldWrapperValue: String
+
+  """
+  Naming convention to apply to all generated identifiers.
+  Default: change-case-all#pascalCase
+  """
+  namingConvention: String
+
+  """String prefix added to all generated type names."""
+  typesPrefix: String
+
+  """String suffix added to all generated type names."""
+  typesSuffix: String
+
+  """Apply typesPrefix to enum names. Default: true."""
+  enumPrefix: Boolean
+
+  """Apply typesSuffix to enum names. Default: true."""
+  enumSuffix: Boolean
+
+  """
+  Add underscore prefix to Args types to prevent name collisions.
+  Default: false
+  """
+  addUnderscoreToArgsType: Boolean
+
+  """
+  Custom type mappings for GraphQL scalars.
+  Format: { ScalarName: 'TypeScriptType' }
+  """
+  scalars: JSON
+
+  """Throw an error when a scalar has no type mapping. Default: false."""
+  strictScalars: Boolean
+
+  """Default TypeScript type for unmapped scalars. Default: unknown."""
+  defaultScalarType: String
+
+  """
+  Override default enum values from the schema.
+  Format: { EnumName: { VALUE: 'mappedValue' } }
+  """
+  enumValues: JSON
+
+  """Ignore enum values defined in the GraphQL schema. Default: false."""
+  ignoreEnumValuesFromSchema: Boolean
+
+  """
+  Override output declaration type for generated types.
+  Values: interface | type | class | abstract class
+  """
+  declarationKind: String
+
+  """Do not add __typename to generated types. Default: false."""
+  skipTypename: Boolean
+
+  """Automatically add non-optional __typename to generated types. Default: false."""
+  nonOptionalTypename: Boolean
+
+  """
+  Control how inline fragments are typed.
+  Values: inline | combine | mask
+  Default: inline
+  """
+  inlineFragmentTypes: String
+
+  """
+  Custom type mappings for directive arguments and input fields.
+  Allows overriding generated TypeScript types for specific directives.
+  """
+  directiveArgumentAndInputFieldMappings: JSON
+
+  """Suffix appended to imported directive mapping types."""
+  directiveArgumentAndInputFieldMappingTypeSuffix: String
+
+  """Use import type {} syntax for type-only imports (TypeScript 3.8+). Default: false."""
+  useTypeImports: Boolean
+
+  """
+  Emit legacy CommonJS imports (without .js extension).
+  Default: true
+  Deprecated: use importExtension instead.
+  """
+  emitLegacyCommonJSImports: Boolean
+
+  """Append this extension to all generated import statements."""
+  importExtension: String
+
+  """Print each field on a new line in generated types. Default: false."""
+  printFieldsOnNewLines: Boolean
+
+  """Include external fragment definitions in generated code. Default: false."""
+  includeExternalFragments: Boolean
+}
+
+# ---------------------------------------------------------------------------
+# TypeScript Resolvers Plugin Configuration
+# ---------------------------------------------------------------------------
+
+"""
+Configuration for the @graphql-codegen/typescript-resolvers plugin.
+Generates TypeScript resolver signatures for a GraphQL schema.
+Source: https://the-guild.dev/graphql/codegen/plugins/typescript/typescript-resolvers
+"""
+type ResolversPluginConfig {
+  """
+  A TypeScript type (or import path#TypeName) to use as the context argument
+  for all generated resolver functions.
+  """
+  contextType: String
+
+  """
+  A TypeScript type for the root value of Query, Mutation, and Subscription resolvers.
+  """
+  rootValueType: String
+
+  """
+  Map GraphQL object type names to custom TypeScript model types.
+  Format: { GraphQLTypeName: 'import-path#ModelTypeName' }
+  """
+  mappers: JSON
+
+  """
+  Fallback TypeScript type for GraphQL types without a mapper entry.
+  Defaults to the generated TypeScript type for that GraphQL type.
+  """
+  defaultMapper: String
+
+  """Add an index signature to generated resolver objects. Default: false."""
+  useIndexSignature: Boolean
+
+  """
+  Remove optional modifiers from resolver signatures.
+  Accepts boolean or granular AvoidOptionalsConfig.
+  Default: false
+  """
+  avoidOptionals: Boolean
+
+  """Enable Apollo Federation support in generated resolvers. Default: false."""
+  federation: Boolean
+
+  """
+  Map GraphQL enum values to custom TypeScript types in resolvers.
+  """
+  enumValues: JSON
+
+  """Wrap field definitions with FieldWrapper<T>. Default: true."""
+  wrapFieldDefinitions: Boolean
+
+  """Allow the Resolver type to be callable. Default: false."""
+  makeResolverTypeCallable: Boolean
+
+  """
+  Make __typename non-optional in generated resolver types.
+  Accepts boolean or granular config.
+  Default: false
+  """
+  resolversNonOptionalTypename: Boolean
+}
+
+# ---------------------------------------------------------------------------
+# ConfiguredOutput (generates block entry)
+# ---------------------------------------------------------------------------
+
+"""
+Per-output configuration block. Each key in the `generates` map of a
+CodegenConfig maps to a ConfiguredOutput (or a bare list of plugins).
+Source: Types.ConfiguredOutput in packages/utils/plugins-helpers/src/types.ts
+"""
+type ConfiguredOutput {
+  """
+  List of plugins to apply to this output file.
+  Each entry is a plugin package name (e.g. 'typescript') or a path to a local plugin file.
+  """
+  plugins: [String!]
+
+  """
+  Preset name or object for dynamic multi-file output generation.
+  Available presets: client, near-operation-file, gql-tag-operations, graphql-modules, import-types.
+  """
+  preset: String
+
+  """
+  Configuration object passed to the preset.
+  Shape depends on the specific preset being used.
+  """
+  presetConfig: JSON
+
+  """
+  Override the global overwrite setting for this output only.
+  When true, existing files are overwritten. Default: true.
+  """
+  overwrite: Boolean
+
+  """
+  GraphQL document files (queries, mutations, subscriptions, fragments) for this output.
+  Accepts paths, glob patterns, or inline SDL strings.
+  """
+  documents: [String!]
+
+  """
+  GraphQL documents loaded for type resolution only; no output files are generated for them.
+  Accepts the same formats as `documents`.
+  """
+  externalDocuments: [String!]
+
+  """
+  Schema source override for this specific output.
+  Accepts URL, file path, glob pattern, or inline SDL.
+  Merged with the root schema if both are provided.
+  """
+  schema: [String!]
+
+  """
+  Plugin configuration for this output. Merged with the root-level config.
+  Keys and values depend on the plugins used.
+  """
+  config: JSON
+
+  """
+  Lifecycle hooks scoped to this output file.
+  Executed before the corresponding root-level hooks.
+  """
+  hooks: LifecycleHooks
+
+  """
+  Document transforms applied to documents before plugin execution, scoped to this output.
+  Each entry is a path to a document transform module or an inline configuration object.
+  """
+  documentTransforms: [String!]
+
+  """
+  Additional glob patterns to watch in watch mode, scoped to this output.
+  """
+  watchPattern: [String!]
+}
+
+# ---------------------------------------------------------------------------
+# CodegenConfig (root configuration)
+# ---------------------------------------------------------------------------
+
+"""
+Root configuration object for GraphQL Code Generator.
+This is the shape of `codegen.yml`, `codegen.ts`, `.codegenrc`, or the `codegen`
+key in `package.json`.
+
+Source: Types.Config in packages/utils/plugins-helpers/src/types.ts
+        CodegenConfig alias in packages/graphql-codegen-cli/src/config.ts
+
+Usage:
+  The CLI reads this config via cosmiconfig and drives the full code generation pipeline.
+  The `generates` map is the primary mechanism: each key is an output path and each
+  value is a ConfiguredOutput specifying which plugins to run and which schema/documents to use.
+"""
+type CodegenConfig {
+  """
+  Pointer(s) to your GraphQL schema. Accepted formats:
+  - HTTP/HTTPS URL (with optional headers and customFetch)
+  - Local path to a .json introspection file
+  - Local path to a .graphql SDL file
+  - Glob pattern resolving to multiple .graphql files
+  - Path to a .js/.ts file that exports a GraphQLSchema object
+  - Inline SDL string
+  Multiple values are merged into a single schema.
+  """
+  schema: [String!]
+
+  """
+  Path(s) to Node.js require() handler files for custom file extensions.
+  Loaded before the main codegen run to enable processing of non-standard files.
+  """
+  require: [String!]
+
+  """
+  A module name, file path, or function used instead of the standard `fetch`
+  when loading schemas from remote HTTP endpoints.
+  """
+  customFetch: String
+
+  """
+  Pointer(s) to GraphQL operation documents (queries, mutations, subscriptions, fragments).
+  Accepted formats match those for `schema`. Applied to all outputs unless overridden.
+  """
+  documents: [String!]
+
+  """
+  Documents loaded for type resolution but not used to generate output files.
+  Accepts the same formats as `documents`.
+  """
+  externalDocuments: [String!]
+
+  """
+  Global plugin configuration passed to all plugins across all outputs.
+  Output-level `config` is merged on top of this.
+  """
+  config: JSON
+
+  """
+  Map from output file paths to generation options.
+  The key is the path where the generated file will be written.
+  The value is a ConfiguredOutput block (or a bare list of plugin names).
+  This field is required.
+  """
+  generates: JSON!
+
+  """
+  Overwrite existing output files. Default: true.
+  """
+  overwrite: Boolean
+
+  """
+  Enable watch mode. Pass true to watch schema/document files, or an array of
+  additional glob patterns to include in the watch set.
+  """
+  watch: Boolean
+
+  """
+  Do not exit with a non-zero code when no matching documents are found.
+  Default: false
+  """
+  ignoreNoDocuments: Boolean
+
+  """
+  Append this extension to all import statements in generated output.
+  Useful for ESM environments (e.g. '.js').
+  Set to '' to suppress any extension.
+  """
+  importExtension: String
+
+  """
+  Emit CommonJS imports without .js extension (legacy behaviour).
+  Default: true
+  Deprecated: prefer importExtension.
+  """
+  emitLegacyCommonJSImports: Boolean
+
+  """Suppress all output except errors. Default: false."""
+  silent: Boolean
+
+  """Output verbose task information. Default: false."""
+  verbose: Boolean
+
+  """Output debug logs. Default: false."""
+  debug: Boolean
+
+  """Print only error messages, suppressing all other output. Default: false."""
+  errorsOnly: Boolean
+
+  """
+  Custom plugin loader function.
+  Useful in browser environments where require() is unavailable.
+  """
+  pluginLoader: String
+
+  """
+  Additional context object passed to all plugins.
+  Accessible in plugin functions via `info.pluginContext`.
+  """
+  pluginContext: JSON
+
+  """
+  Configuration for @graphql-tools/graphql-tag-pluck, which extracts
+  GraphQL operations from code files.
+  """
+  pluckConfig: PluckConfig
+
+  """
+  Lifecycle hook scripts applied globally across all output files.
+  """
+  hooks: LifecycleHooks
+
+  """
+  Raise errors for invalid GraphQL files instead of silently ignoring them.
+  Default: false
+  """
+  noSilentErrors: Boolean
+
+  """
+  If true, write whichever generates blocks succeed even if others fail.
+  If false (default), a single failure prevents all output from being written.
+  Default: false
+  """
+  allowPartialOutputs: Boolean
+
+  """
+  Override the working directory used by the codegen CLI.
+  Defaults to process.cwd().
+  """
+  cwd: String
+}
+
+# ---------------------------------------------------------------------------
+# Plugin API types
+# ---------------------------------------------------------------------------
+
+"""
+A loaded GraphQL document file. Extends @graphql-tools/utils Source.
+Produced by the document loader and passed to each plugin.
+"""
+type DocumentFile {
+  """Absolute path to the source file."""
+  location: String
+
+  """
+  Content hash of the document (used for caching validation results).
+  Null when caching is disabled.
+  """
+  hash: String
+
+  """
+  Whether the document is a standard operation document or an external/shared fragment.
+  Values: standard | external
+  """
+  type: String
+}
+
+"""
+Output produced by a single plugin execution.
+Plugins return either a plain string or a ComplexPluginOutput.
+"""
+type ComplexPluginOutput {
+  """The main generated code content to append to the output file."""
+  content: String!
+
+  """
+  Strings to prepend to the output file (imports, license headers, etc.).
+  Automatically sorted: comments, package statements, imports, then other content.
+  """
+  prepend: [String!]
+
+  """Strings to append at the end of the output file."""
+  append: [String!]
+
+  """
+  Arbitrary metadata produced by the plugin.
+  Not written to the output file; available for programmatic consumers.
+  """
+  meta: JSON
+}
+
+"""
+Options passed to the core codegen() function for each output file.
+Constructed from the CodegenConfig and ConfiguredOutput after schema/document loading.
+Source: Types.GenerateOptions in packages/utils/plugins-helpers/src/types.ts
+"""
+type GenerateOptions {
+  """Absolute path of the output file to generate."""
+  filename: String!
+
+  """Ordered list of plugins to execute, each as {pluginName: pluginConfig}."""
+  plugins: [JSON!]!
+
+  """
+  Loaded and merged GraphQL schema as a DocumentNode (AST).
+  Also available as a GraphQLSchema object via schemaAst.
+  """
+  schema: JSON!
+
+  """
+  Loaded GraphQL documents (operations and fragments) to pass to plugins.
+  """
+  documents: [DocumentFile!]!
+
+  """
+  Merged configuration (root config merged with output-level config).
+  Passed to all plugins.
+  """
+  config: JSON!
+
+  """
+  Map from plugin name to the loaded CodegenPlugin object.
+  """
+  pluginMap: JSON!
+
+  """
+  Document validation options for this output.
+  """
+  skipDocumentsValidation: SkipDocumentsValidationOptions
+
+  """Additional context passed to plugins."""
+  pluginContext: JSON
+
+  """Whether to emit legacy CommonJS imports."""
+  emitLegacyCommonJSImports: Boolean
+
+  """Extension to append to import statements."""
+  importExtension: String
+}
+
+"""
+The CodegenPlugin interface that every plugin must implement.
+Source: CodegenPlugin in packages/utils/plugins-helpers/src/types.ts
+
+Plugin functions are loaded by name (NPM package or local file path) and must
+export an object conforming to this shape.
+"""
+type CodegenPlugin {
+  """
+  The main code generation function.
+  Signature: (schema: GraphQLSchema, documents: DocumentFile[], config: T, info?) => string | ComplexPluginOutput
+
+  - schema: the merged GraphQLSchema for this output
+  - documents: loaded operation/fragment documents
+  - config: merged plugin configuration
+  - info.outputFile: the output file path
+  - info.allPlugins: all plugins for this output
+  - info.pluginContext: shared context object
+  """
+  plugin: String!
+
+  """
+  Optional SDL string or DocumentNode to merge into the schema before generation.
+  Can be a static value or a function of the plugin config.
+  """
+  addToSchema: String
+
+  """
+  Optional validation function called before the plugin runs.
+  Throws to prevent generation; used to check config correctness.
+  Signature: (schema, documents, config, outputFile, allPlugins, pluginContext?) => void
+  """
+  validate: String
+}
+
+# ---------------------------------------------------------------------------
+# Query type (required by GraphQL spec; acts as documentation entry point)
+# ---------------------------------------------------------------------------
+
+"""
+Entry point for introspecting this schema.
+Because GraphQL Code Generator is a CLI tool with no live endpoint,
+this Query type exists solely to satisfy the GraphQL spec requirement
+for a schema root type and to expose the documented configuration types.
+"""
+type Query {
+  """
+  Returns the canonical documentation for the CodegenConfig root type.
+  Use __type(name: "CodegenConfig") { fields { name description } } to introspect.
+  """
+  codegenConfigDocs: CodegenConfig
+
+  """
+  Returns the canonical documentation for the ConfiguredOutput (generates entry) type.
+  """
+  configuredOutputDocs: ConfiguredOutput
+
+  """
+  Returns the canonical documentation for the LifecycleHooks type.
+  """
+  lifecycleHooksDocs: LifecycleHooks
+
+  """
+  Returns the canonical documentation for the TypeScriptPluginConfig type.
+  """
+  typeScriptPluginConfigDocs: TypeScriptPluginConfig
+
+  """
+  Returns the canonical documentation for the ResolversPluginConfig type.
+  """
+  resolversPluginConfigDocs: ResolversPluginConfig
+
+  """
+  Returns the canonical documentation for the CodegenPlugin interface type.
+  """
+  codegenPluginDocs: CodegenPlugin
+
+  """
+  Returns the canonical documentation for the GenerateOptions type.
+  """
+  generateOptionsDocs: GenerateOptions
+}
+
+schema {
+  query: Query
+}

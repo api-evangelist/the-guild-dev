@@ -1,0 +1,82 @@
+[
+  {
+    "repo": "graphql-hive",
+    "captured_at": "2026-06-20T182334",
+    "source_url": "https://the-guild.dev/graphql/hive",
+    "source_type": "Website",
+    "file": "graphql-hive-2026-06-20T182334.png",
+    "bytes": 204332
+  },
+  {
+    "repo": "graphql-mesh",
+    "captured_at": "2026-06-20T182334",
+    "source_url": "https://the-guild.dev/graphql/mesh",
+    "source_type": "Website",
+    "file": "graphql-mesh-2026-06-20T182334.png",
+    "bytes": 85866
+  },
+  {
+    "repo": "graphql-yoga",
+    "captured_at": "2026-06-20T182340",
+    "source_url": "https://the-guild.dev/graphql/yoga-server",
+    "source_type": "Website",
+    "file": "graphql-yoga-2026-06-20T182340.png",
+    "bytes": 104641
+  },
+  {
+    "repo": "graphql-tools",
+    "captured_at": "2026-06-20T182340",
+    "source_url": "https://the-guild.dev/graphql/tools",
+    "source_type": "Website",
+    "file": "graphql-tools-2026-06-20T182340.png",
+    "bytes": 157347
+  },
+  {
+    "repo": "graphql-code-generator",
+    "captured_at": "2026-06-20T182329",
+    "source_url": "https://the-guild.dev/graphql/codegen",
+    "source_type": "Website",
+    "file": "graphql-code-generator-2026-06-20T182329.png",
+    "bytes": 98585
+  },
+  {
+    "repo": "graphql-codegen",
+    "captured_at": "2026-06-20T182333",
+    "source_url": "https://the-guild.dev/graphql/codegen",
+    "source_type": "Website",
+    "file": "graphql-codegen-2026-06-20T182333.png",
+    "bytes": 98585
+  },
+  {
+    "repo": "graphql-inspector",
+    "captured_at": "2026-06-20T182337",
+    "source_url": "https://the-guild.dev/graphql/inspector",
+    "source_type": "Website",
+    "file": "graphql-inspector-2026-06-20T182337.png",
+    "bytes": 124881
+  },
+  {
+    "repo": "graphql-scalars",
+    "captured_at": "2026-06-20T182338",
+    "source_url": "https://the-guild.dev/graphql/scalars",
+    "source_type": "Website",
+    "file": "graphql-scalars-2026-06-20T182338.png",
+    "bytes": 122913
+  },
+  {
+    "repo": "envelop",
+    "captured_at": "2026-06-20T180735",
+    "source_url": "https://the-guild.dev/graphql/envelop",
+    "source_type": "Website",
+    "file": "envelop-2026-06-20T180735.png",
+    "bytes": 268747
+  },
+  {
+    "repo": "schema-stitching",
+    "captured_at": "2026-06-20T193517",
+    "source_url": "https://the-guild.dev/graphql/stitching",
+    "source_type": "Website",
+    "file": "schema-stitching-2026-06-20T193517.png",
+    "bytes": 215096
+  }
+]

@@ -1,0 +1,796 @@
+"""
+GraphQL Tools SDL Schema
+Source: https://github.com/ardatan/graphql-tools
+Packages: @graphql-tools/schema, @graphql-tools/merge, @graphql-tools/utils,
+          @graphql-tools/mock, @graphql-tools/wrap, @graphql-tools/load
+
+GraphQL Tools is a library — not a hosted API. This SDL documents the
+TypeScript type API surface as GraphQL types for tooling and documentation
+purposes. Types are drawn from the published TypeScript declaration files
+across the @graphql-tools/* package family.
+"""
+
+# ---------------------------------------------------------------------------
+# Scalars
+# ---------------------------------------------------------------------------
+
+"""Represents any JSON-serializable value."""
+scalar JSON
+
+"""
+A GraphQL document string or DocumentNode. Accepted anywhere SDL or
+document source text is valid.
+"""
+scalar TypeSource
+
+# ---------------------------------------------------------------------------
+# Enumerations
+# ---------------------------------------------------------------------------
+
+"""
+Identifies the kind of schema element a SchemaMapper function targets.
+Used with mapSchema() from @graphql-tools/utils.
+"""
+enum MapperKind {
+  TYPE
+  SCALAR_TYPE
+  ENUM_TYPE
+  COMPOSITE_TYPE
+  OBJECT_TYPE
+  INPUT_OBJECT_TYPE
+  ABSTRACT_TYPE
+  UNION_TYPE
+  INTERFACE_TYPE
+  ROOT_OBJECT
+  QUERY
+  MUTATION
+  SUBSCRIPTION
+  DIRECTIVE
+  FIELD
+  COMPOSITE_FIELD
+  OBJECT_FIELD
+  ROOT_FIELD
+  QUERY_ROOT_FIELD
+  MUTATION_ROOT_FIELD
+  SUBSCRIPTION_ROOT_FIELD
+  INTERFACE_FIELD
+  INPUT_OBJECT_FIELD
+  ARGUMENT
+  ENUM_VALUE
+}
+
+"""
+Controls how resolver validation failures are reported.
+Used in IResolverValidationOptions.
+"""
+enum ValidatorBehavior {
+  """Throw an error."""
+  error
+  """Emit a warning but continue."""
+  warn
+  """Silently ignore the issue."""
+  ignore
+}
+
+# ---------------------------------------------------------------------------
+# Core schema-building types  (@graphql-tools/schema)
+# ---------------------------------------------------------------------------
+
+"""
+Configuration object passed to makeExecutableSchema().
+Corresponds to IExecutableSchemaDefinition<TContext> in TypeScript.
+Source: packages/schema/src/types.ts
+"""
+type IExecutableSchemaDefinition {
+  """
+  SDL type definitions — a string, DocumentNode, GraphQLSchema, or an
+  array / function returning any of those.
+  """
+  typeDefs: TypeSource!
+
+  """
+  Resolver map. Each key is a type name; values are field resolver
+  functions or IFieldResolverOptions objects.
+  """
+  resolvers: JSON
+
+  """Options controlling how missing resolvers are reported."""
+  resolverValidationOptions: IResolverValidationOptions
+
+  """
+  When true, object types implementing an interface inherit resolvers
+  defined on that interface in the resolvers map.
+  """
+  inheritResolversFromInterfaces: Boolean
+
+  """
+  When true, modifies the existing schema in place instead of cloning it.
+  """
+  updateResolversInPlace: Boolean
+
+  """Schema extensions to attach to the built schema."""
+  schemaExtensions: JSON
+
+  """Default field resolver used when no resolver is defined for a field."""
+  defaultFieldResolver: JSON
+}
+
+"""
+Options that control which missing resolver scenarios emit warnings or errors.
+Corresponds to IResolverValidationOptions in TypeScript.
+Source: packages/utils/src/Interfaces.ts
+"""
+type IResolverValidationOptions {
+  """Require a resolver for every field that has arguments."""
+  requireResolversForArgs: ValidatorBehavior
+
+  """Require a resolver for every non-scalar return type."""
+  requireResolversForNonScalar: ValidatorBehavior
+
+  """Require a resolver for every field in the schema."""
+  requireResolversForAllFields: ValidatorBehavior
+
+  """Require resolveType() for Interface and Union types."""
+  requireResolversForResolveType: ValidatorBehavior
+
+  """Require that every defined resolver maps to an actual schema field."""
+  requireResolversToMatchSchema: ValidatorBehavior
+}
+
+"""
+Options for addResolversToSchema().
+Corresponds to IAddResolversToSchemaOptions in TypeScript.
+Source: packages/utils/src/Interfaces.ts
+"""
+type IAddResolversToSchemaOptions {
+  """The target schema."""
+  schema: GraphQLSchemaType!
+
+  """Resolver map to attach."""
+  resolvers: JSON!
+
+  """Override the default graphql-js field resolver."""
+  defaultFieldResolver: JSON
+
+  """Resolver validation options."""
+  resolverValidationOptions: IResolverValidationOptions
+
+  """Inherit resolvers from implemented interfaces."""
+  inheritResolversFromInterfaces: Boolean
+
+  """Modify the schema in place rather than producing a new one."""
+  updateResolversInPlace: Boolean
+}
+
+"""
+Opaque representation of a built GraphQLSchema object (from graphql-js).
+In SDL this is modeled as a type with descriptive metadata fields.
+"""
+type GraphQLSchemaType {
+  """Schema description string if present."""
+  description: String
+
+  """Names of all types defined in the schema."""
+  typeNames: [String!]!
+
+  """Name of the Query root type."""
+  queryType: String
+
+  """Name of the Mutation root type, if any."""
+  mutationType: String
+
+  """Name of the Subscription root type, if any."""
+  subscriptionType: String
+
+  """Directives defined in the schema."""
+  directives: [String!]!
+}
+
+# ---------------------------------------------------------------------------
+# Schema merging types  (@graphql-tools/merge)
+# ---------------------------------------------------------------------------
+
+"""
+Options for mergeResolvers().
+Corresponds to MergeResolversOptions in TypeScript.
+Source: packages/merge/src/merge-resolvers.ts
+"""
+type MergeResolversOptions {
+  """
+  Resolver keys to exclude from the merged output, in "TypeName.fieldName"
+  format. Use "TypeName.*" to exclude an entire type.
+  """
+  exclusions: [String!]
+}
+
+"""
+Options for mergeTypeDefs() / mergeSchemas().
+Corresponds to Config / MergeSchemasConfig in TypeScript.
+Source: packages/merge/src/typedefs-mergers/
+"""
+type MergeTypesOptions {
+  """When true, comments are converted to descriptions during parsing."""
+  commentDescriptions: Boolean
+
+  """
+  When true, the merge will throw an error on conflicting type definitions
+  instead of silently merging them.
+  """
+  throwOnConflict: Boolean
+
+  """When true, enum values from all sources are unioned."""
+  useSchemaDefinition: Boolean
+
+  """When true, force schema definition to be included in the output."""
+  forceSchemaDefinition: Boolean
+
+  """When true, reverse the order of merged type arrays."""
+  reverseDirectives: Boolean
+
+  """When true, exclude type extensions from the merged output."""
+  exclusions: [String!]
+
+  """
+  Sort type definitions in the output document.
+  Accepts "none" (default) or "alphabetical".
+  """
+  sort: Boolean
+
+  """
+  When true, converts all SDL comments (# …) to block-string descriptions.
+  """
+  convertExtensions: Boolean
+
+  """When true, include all directives from merged schemas."""
+  consistentEnumMerge: Boolean
+}
+
+# ---------------------------------------------------------------------------
+# Schema stitching types  (@graphql-tools/stitch / @graphql-tools/delegate)
+# ---------------------------------------------------------------------------
+
+"""
+Configuration for a subschema participating in schema stitching.
+Corresponds to SubschemaConfig in TypeScript.
+Source: packages/delegate/src/ (re-exported from @graphql-tools/delegate)
+"""
+type SubschemaConfig {
+  """The underlying executable GraphQL schema."""
+  schema: GraphQLSchemaType!
+
+  """Optional executor function for remote or custom execution."""
+  executor: JSON
+
+  """Transforms applied to this subschema before stitching."""
+  transforms: [TransformConfig!]
+
+  """Merge configuration keyed by type name."""
+  merge: JSON
+
+  """
+  When true, uses DataLoader batching for field plan execution.
+  """
+  batch: Boolean
+
+  """Maximum batch size for batched execution."""
+  batchingOptions: BatchingOptions
+
+  """Name of this subschema, used in error messages and stitching directives."""
+  name: String
+}
+
+"""Batching options for a SubschemaConfig."""
+type BatchingOptions {
+  """Maximum number of requests per batch."""
+  maxBatchSize: Int
+
+  """DataLoader options (cache, cacheKeyFn, etc.)."""
+  dataLoaderOptions: JSON
+}
+
+"""
+Per-type merge configuration within SubschemaConfig.merge.
+Corresponds to MergedTypeConfig in TypeScript.
+Source: packages/delegate/src/ (re-exported from @graphql-tools/delegate)
+"""
+type MergedTypeConfig {
+  """
+  Selection set string used to fetch key fields for this type
+  from the owning subschema, e.g. "{ id }".
+  """
+  selectionSet: String
+
+  """
+  Resolver function that fetches the merged type from this subschema
+  given a representation object.
+  """
+  resolve: JSON
+
+  """
+  Query field name and arguments used to fetch a batch of merged types.
+  """
+  fieldName: String
+
+  """
+  When true, this subschema is the canonical source for this type's
+  non-key fields.
+  """
+  canonical: Boolean
+
+  """
+  Function that returns additional variables for the merged type query.
+  """
+  args: JSON
+
+  """
+  Key field(s) or function extracting a key from a resolved object.
+  """
+  key: JSON
+
+  """
+  Function that extracts the key from arbitrary query arguments.
+  """
+  argsFromKeys: JSON
+
+  """
+  Unique field that identifies a merged type across subschemas.
+  """
+  uniqueFields: [String!]
+
+  """
+  Fields from this subschema that are computed from fields in other
+  subschemas.
+  """
+  computedFields: JSON
+
+  """Stitching directives merge configuration."""
+  entryPoints: [MergedTypeEntryPoint!]
+}
+
+"""Represents a single entry-point for fetching a merged type."""
+type MergedTypeEntryPoint {
+  """Selection set providing type keys, e.g. "{ id }"."""
+  selectionSet: String!
+
+  """Query field used to fetch a single object."""
+  fieldName: String
+
+  """Function that maps the key to field arguments."""
+  args: JSON
+
+  """Function that maps a list of keys to batched field arguments."""
+  argsFromKeys: JSON
+
+  """Function that extracts the key from a resolved field value."""
+  key: JSON
+}
+
+"""
+Runtime stitching metadata attached to the merged schema.
+Corresponds to StitchingInfo in TypeScript.
+Source: @graphql-tools/delegate
+"""
+type StitchingInfo {
+  """Map of subschema configurations keyed by their GraphQL schema object."""
+  subschemaMap: JSON
+
+  """
+  Per-type merge plan: which subschemas provide which fields.
+  """
+  mergedTypes: JSON
+
+  """
+  Mapping from stitched schema field paths back to their delegate
+  subschema and field names.
+  """
+  fieldNodesByType: JSON
+
+  """
+  Mapping from type name to the set of subschemas that define it.
+  """
+  fieldNodesByField: JSON
+
+  """Dynamic merge plan for the schema."""
+  dynamicDirectiveInfo: JSON
+}
+
+# ---------------------------------------------------------------------------
+# Transform types  (@graphql-tools/wrap / @graphql-tools/utils)
+# ---------------------------------------------------------------------------
+
+"""
+Abstract representation of a schema transform.
+Corresponds to the Transform interface in TypeScript.
+Source: @graphql-tools/utils / @graphql-tools/wrap
+"""
+interface Transform {
+  """Human-readable name identifying the transform class."""
+  name: String!
+}
+
+"""Opaque descriptor for a configured transform instance."""
+type TransformConfig {
+  """Transform class name, e.g. RenameTypes, FilterObjectFields."""
+  name: String!
+
+  """Serialised constructor arguments for documentation purposes."""
+  options: JSON
+}
+
+"""
+Renames types throughout a schema using a renamer function.
+Corresponds to class RenameTypes in @graphql-tools/wrap.
+Constructor: new RenameTypes(renamer, options?)
+"""
+type RenameTypes implements Transform {
+  name: String!
+
+  """
+  Renamer function signature: (typeName: string) => string | undefined.
+  Return undefined to leave the name unchanged.
+  """
+  renamer: JSON!
+
+  """Whether to rename built-in scalar and introspection types."""
+  options: RenameTypesOptions
+}
+
+"""Options for the RenameTypes transform."""
+type RenameTypesOptions {
+  """When true, built-in types (String, Int, etc.) are also renamed."""
+  renameBuiltins: Boolean!
+
+  """When true, scalar types are included in renaming."""
+  renameScalars: Boolean!
+}
+
+"""
+Renames fields on object types using a renamer function.
+Corresponds to class RenameObjectFields in @graphql-tools/wrap.
+Constructor: new RenameObjectFields(renamer)
+"""
+type RenameObjectFields implements Transform {
+  name: String!
+
+  """
+  Renamer function signature:
+  (typeName: string, fieldName: string, fieldConfig: GraphQLFieldConfig) => string
+  """
+  renamer: JSON!
+}
+
+"""
+Renames root fields (Query / Mutation / Subscription) using a renamer function.
+Corresponds to class RenameRootFields in @graphql-tools/wrap.
+Constructor: new RenameRootFields(renamer)
+"""
+type RenameRootFields implements Transform {
+  name: String!
+
+  """
+  Renamer function signature:
+  (operation: 'Query'|'Mutation'|'Subscription', fieldName: string, fieldConfig: GraphQLFieldConfig) => string
+  """
+  renamer: JSON!
+}
+
+"""
+Removes types from a schema using a filter function.
+Corresponds to class FilterTypes in @graphql-tools/wrap.
+Constructor: new FilterTypes(filter)
+"""
+type FilterTypes implements Transform {
+  name: String!
+
+  """
+  Filter function signature: (type: GraphQLNamedType) => boolean.
+  Return false to remove the type.
+  """
+  filter: JSON!
+}
+
+"""
+Removes fields from object types using a filter function.
+Corresponds to class FilterObjectFields in @graphql-tools/wrap.
+Constructor: new FilterObjectFields(filter)
+"""
+type FilterObjectFields implements Transform {
+  name: String!
+
+  """
+  Filter function signature:
+  (typeName: string, fieldName: string, fieldConfig: GraphQLFieldConfig) => boolean.
+  Return false to remove the field.
+  """
+  filter: JSON!
+}
+
+"""
+Removes root fields from Query/Mutation/Subscription using a filter function.
+Corresponds to class FilterRootFields in @graphql-tools/wrap.
+Constructor: new FilterRootFields(filter)
+"""
+type FilterRootFields implements Transform {
+  name: String!
+
+  """
+  Filter function signature:
+  (operation: 'Query'|'Mutation'|'Subscription', rootFieldName: string, fieldConfig: GraphQLFieldConfig) => boolean
+  """
+  filter: JSON!
+}
+
+"""
+Wraps a query field in an outer selection set before delegating, then
+unwraps the response on the way back.
+Corresponds to class WrapQuery in @graphql-tools/wrap.
+Constructor: new WrapQuery(path, wrapper, extractor)
+"""
+type WrapQuery implements Transform {
+  name: String!
+
+  """
+  Path to the field to wrap, e.g. ["user", "address"].
+  """
+  path: [String!]!
+
+  """
+  Wrapper function that adds extra selections around the inner field.
+  Signature: (subselection: SelectionSetNode) => SelectionSetNode
+  """
+  wrapper: JSON!
+
+  """
+  Extractor function that retrieves the result after execution.
+  Signature: (result: any) => any
+  """
+  extractor: JSON!
+}
+
+"""
+Wraps a mutation field in an outer selection set before delegating, then
+unwraps the response on the way back.
+Corresponds to class WrapMutation in @graphql-tools/wrap.
+Constructor: new WrapMutation(path, wrapper, extractor)
+"""
+type WrapMutation implements Transform {
+  name: String!
+
+  """Path to the mutation field to wrap."""
+  path: [String!]!
+
+  """Wrapper function for the mutation selection set."""
+  wrapper: JSON!
+
+  """Extractor function for the mutation response."""
+  extractor: JSON!
+}
+
+"""
+Hoists a nested field to the root of a type, removing the intermediate
+wrapper type.
+Corresponds to class HoistField in @graphql-tools/wrap.
+Constructor: new HoistField(typeName, pathConfig, newFieldName)
+"""
+type HoistField implements Transform {
+  name: String!
+
+  """Name of the object type containing the nested field."""
+  typeName: String!
+
+  """
+  Path from the type to the target nested field, e.g. ["address", "street"].
+  Each element is either a field name string or a PathConfig object.
+  """
+  pathConfig: JSON!
+
+  """Name to give the hoisted field at the root of typeName."""
+  newFieldName: String!
+
+  """Optional alias for the field at the original nested location."""
+  alias: String
+}
+
+"""
+Remaps result fields after execution using a custom field-node mapper.
+Corresponds to class MapFields in @graphql-tools/wrap.
+Constructor: new MapFields(fieldNodeTransformerMap, objectValueTransformerMap?, errorPathTransformerMap?)
+"""
+type MapFields implements Transform {
+  name: String!
+
+  """
+  Map of type name -> field name -> FieldNodeMapper function.
+  Signature: (fieldNode, fragments, transformationContext) => SelectionNode | SelectionNode[]
+  """
+  fieldNodeTransformerMap: JSON!
+
+  """
+  Optional map of type name -> field name -> object value transformer.
+  Transforms result values after execution.
+  """
+  objectValueTransformerMap: JSON
+
+  """
+  Optional map of type name -> field name -> error path transformer.
+  Adjusts error paths in execution results.
+  """
+  errorPathTransformerMap: JSON
+}
+
+# ---------------------------------------------------------------------------
+# Mocking types  (@graphql-tools/mock)
+# ---------------------------------------------------------------------------
+
+"""
+Store that holds mocked type/field values used by addMocksToSchema().
+Corresponds to IMockStore in TypeScript.
+Source: packages/mock/src/types.ts
+"""
+type MockStore {
+  """The schema the store is built against."""
+  schema: GraphQLSchemaType!
+}
+
+"""
+Options accepted by addMocksToSchema().
+Source: packages/mock/src/addMocksToSchema.ts
+"""
+type AddMocksToSchemaOptions {
+  """The schema to add mocks to."""
+  schema: GraphQLSchemaType!
+
+  """
+  Mock map — keyed by type name, values are mock functions or scalar values.
+  """
+  mocks: JSON
+
+  """
+  When true, resolvers already on the schema are preserved and only
+  missing resolvers are replaced with mocks.
+  """
+  preserveResolvers: Boolean
+
+  """
+  Optional MockStore instance to use for value storage across mock
+  resolver calls.
+  """
+  store: MockStore
+
+  """Controls mock value generation behaviour."""
+  generationBehavior: MockGenerationBehavior
+}
+
+"""Controls the determinism of generated mock values."""
+enum MockGenerationBehavior {
+  """Values vary between calls."""
+  random
+  """Values are stable for a given key/field combination."""
+  deterministic
+}
+
+"""
+A simple mocked server wrapping an executable schema.
+Corresponds to IMockServer in TypeScript.
+Source: packages/mock/src/types.ts
+"""
+type MockServer {
+  """Executes a GraphQL query string against the mocked schema."""
+  query(query: String!, vars: JSON): ExecutionResult
+}
+
+# ---------------------------------------------------------------------------
+# Execution result  (@graphql-tools/utils)
+# ---------------------------------------------------------------------------
+
+"""
+Standard GraphQL execution result extended with incremental delivery fields.
+Corresponds to ExecutionResult<TData, TExtensions> in TypeScript.
+Source: packages/utils/src/Interfaces.ts
+"""
+type ExecutionResult {
+  """Execution data payload, null on errors."""
+  data: JSON
+
+  """List of errors returned by the executor."""
+  errors: [GraphQLErrorType!]
+
+  """
+  True when a subsequent incremental delivery payload is expected
+  (defer / stream).
+  """
+  hasNext: Boolean
+
+  """Non-standard extension data."""
+  extensions: JSON
+
+  """Label for incremental delivery chunks."""
+  label: String
+
+  """Path for incremental delivery items."""
+  path: [String!]
+
+  """Incremental delivery partial results."""
+  incremental: [ExecutionResult!]
+}
+
+"""Simplified representation of a GraphQLError."""
+type GraphQLErrorType {
+  """Human-readable error message."""
+  message: String!
+
+  """Locations in the source document where the error occurred."""
+  locations: [ErrorLocation!]
+
+  """Field path in the response where the error occurred."""
+  path: [String!]
+
+  """Optional non-standard extension data."""
+  extensions: JSON
+}
+
+"""Source location of a GraphQL error."""
+type ErrorLocation {
+  """1-based line number in the source document."""
+  line: Int!
+
+  """1-based column number in the source document."""
+  column: Int!
+}
+
+# ---------------------------------------------------------------------------
+# Utility filter / rename function types  (@graphql-tools/utils)
+# ---------------------------------------------------------------------------
+
+"""
+Function type: (typeName, type) => boolean.
+Return false to exclude the type.
+Corresponds to TypeFilter in @graphql-tools/utils.
+"""
+scalar TypeFilter
+
+"""
+Function type: (typeName, fieldName, fieldConfig) => boolean.
+Return false to exclude the field.
+Corresponds to ObjectFieldFilter / FieldFilter in @graphql-tools/utils.
+"""
+scalar ObjectFieldFilter
+
+"""
+Function type:
+  (operation, rootFieldName, fieldConfig) => boolean.
+Return false to exclude the root field.
+Corresponds to RootFieldFilter in @graphql-tools/utils.
+"""
+scalar RootFieldFilter
+
+# ---------------------------------------------------------------------------
+# Root Query (required by SDL; library has no runtime query endpoint)
+# ---------------------------------------------------------------------------
+
+"""
+Nominal Query type — this schema documents a library, not a hosted service.
+No live endpoint exists; all types above describe the library's TypeScript API.
+"""
+type Query {
+  """Returns metadata about the GraphQL Tools library."""
+  libraryInfo: LibraryInfo
+}
+
+"""Descriptive metadata about the GraphQL Tools library."""
+type LibraryInfo {
+  """Library name."""
+  name: String!
+
+  """Current stable version series."""
+  version: String!
+
+  """Primary npm organisation scope."""
+  npmScope: String!
+
+  """Link to official documentation."""
+  docsUrl: String!
+
+  """Link to GitHub repository."""
+  githubUrl: String!
+}

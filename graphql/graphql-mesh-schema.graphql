@@ -1,0 +1,2140 @@
+"""
+GraphQL Mesh Configuration Schema
+Source: https://github.com/ardatan/graphql-mesh (ardatan/graphql-mesh)
+Package: @graphql-mesh/types — packages/legacy/types/src/config.ts
+
+GraphQL Mesh is a gateway framework by The Guild that composes REST, gRPC, SOAP, OData,
+Thrift, GraphQL, and database sources into a unified GraphQL API. This SDL describes the
+configuration types used to define a Mesh gateway (meshrc.yaml / meshrc.json / meshrc.ts).
+
+The gateway itself serves a user-defined composed schema at /graphql (default port 4000).
+These types describe the gateway's own configuration surface, not end-user query types.
+"""
+
+# ---------------------------------------------------------------------------
+# Scalars
+# ---------------------------------------------------------------------------
+
+"""Arbitrary JSON value (object, array, string, number, boolean, or null)."""
+scalar JSON
+
+"""A URL string."""
+scalar URL
+
+# ---------------------------------------------------------------------------
+# Root configuration
+# ---------------------------------------------------------------------------
+
+"""
+Root configuration object for a GraphQL Mesh gateway.
+Corresponds to the top-level .meshrc.yaml / .meshrc.json / .meshrc.ts file.
+"""
+type MeshConfig {
+  """HTTP server configuration (used by mesh start / mesh dev)."""
+  serve: ServeConfig
+
+  """SDK generation configuration."""
+  sdk: SDKConfig
+
+  """GraphQL Code Generator configuration (arbitrary)."""
+  codegen: JSON
+
+  """
+  List of module paths to require before running mesh commands.
+  Useful for loading environment variables or TypeScript register hooks.
+  """
+  require: [String!]
+
+  """
+  The list of external data sources that form the mesh.
+  At least one source is required.
+  """
+  sources: [Source!]!
+
+  """Transforms applied to the unified (merged) schema."""
+  transforms: [Transform!]
+
+  """
+  Additional SDL type definitions or overrides appended to the composed schema.
+  May be a string of SDL, a file path, or an array of either.
+  """
+  additionalTypeDefs: JSON
+
+  """
+  Additional resolvers added to the schema after composition.
+  Each entry is either a path to a resolver file or an inline stitching resolver object.
+  """
+  additionalResolvers: [JSON]
+
+  """Caching backend configuration."""
+  cache: Cache
+
+  """Schema merge strategy. One of: stitching, bare, federation."""
+  merger: String
+
+  """
+  PubSub provider for subscriptions.
+  May be a package name string or an inline PubSubConfig object.
+  """
+  pubsub: JSON
+
+  """
+  GraphQL document file paths or SDL strings used for the playground,
+  schema validation, and SDK generation.
+  """
+  documents: [String!]
+
+  """Persisted operations configuration."""
+  persistedOperations: PersistedOperationsConfig
+
+  """Path to a logger instance compatible with the Mesh Logger interface."""
+  logger: String
+
+  """Path to a W3C-compatible custom fetch implementation."""
+  customFetch: JSON
+
+  """
+  When true, SSL validation is skipped for upstream API connections.
+  Default: false.
+  """
+  skipSSLValidation: Boolean
+
+  """Path to a JavaScript file that exports additional Envelop plugins."""
+  additionalEnvelopPlugins: String
+
+  """Mesh plugins for cross-cutting gateway behaviors."""
+  plugins: [Plugin!]
+
+  """
+  Polling interval in milliseconds for CDN-backed sources (e.g., Federation supergraphs)
+  without requiring a gateway restart.
+  """
+  pollingInterval: Int
+}
+
+# ---------------------------------------------------------------------------
+# Server configuration
+# ---------------------------------------------------------------------------
+
+"""
+HTTP server configuration for the mesh start / mesh dev commands.
+Not available when using GraphQL Mesh programmatically.
+"""
+type ServeConfig {
+  """
+  Number of Node.js cluster worker processes.
+  Set to true to use the number of available CPUs.
+  Default: 1.
+  """
+  fork: JSON
+
+  """
+  TCP port to listen on.
+  Default: 4000.
+  """
+  port: JSON
+
+  """
+  Hostname or IP address to bind.
+  Default: localhost.
+  """
+  hostname: String
+
+  """Cross-origin resource sharing (CORS) configuration."""
+  cors: CorsConfig
+
+  """Path to a directory of static files served alongside the GraphQL endpoint."""
+  staticFiles: String
+
+  """
+  When true, serves GraphiQL playground at the GraphQL endpoint.
+  Default: true in dev mode.
+  """
+  playground: Boolean
+
+  """SSL credentials enabling HTTPS. When provided, Mesh serves over HTTPS."""
+  sslCredentials: HTTPSConfig
+
+  """
+  URL path for the GraphQL endpoint.
+  Default: /graphql.
+  """
+  endpoint: String
+
+  """
+  Browser to open in development mode.
+  Set to false to disable auto-open.
+  """
+  browser: JSON
+
+  """Title shown in the GraphiQL playground tab."""
+  playgroundTitle: String
+
+  """
+  Maximum number of operations in a batched request.
+  Enables GraphQL request batching per the graphql-over-http batching RFC.
+  """
+  batchingLimit: Int
+
+  """
+  URL path for the health check endpoint.
+  Example: /health
+  """
+  healthCheckEndpoint: String
+
+  """
+  Additional request body parameter names allowed beyond the standard
+  query, variables, extensions, and operationName.
+  """
+  extraParamNames: [String!]
+}
+
+"""CORS configuration for the Mesh HTTP server."""
+type CorsConfig {
+  """Allowed origin(s). May be a string, boolean, regex, or array."""
+  origin: JSON
+
+  """HTTP headers the server is allowed to expose."""
+  allowedHeaders: [String!]
+
+  """Headers exposed to the browser."""
+  exposedHeaders: [String!]
+
+  """Whether to include credentials in CORS responses."""
+  credentials: Boolean
+
+  """Preflight cache duration in seconds."""
+  maxAge: Int
+
+  """When true, forwards the preflight request to the next handler."""
+  preflightContinue: Boolean
+
+  """HTTP status code returned for successful OPTIONS requests. Default: 204."""
+  optionsSuccessStatus: Int
+}
+
+"""TLS/SSL credentials for serving Mesh over HTTPS."""
+type HTTPSConfig {
+  """Path to the private key file (PEM format)."""
+  key: String!
+
+  """Path to the certificate file (PEM format)."""
+  cert: String!
+}
+
+# ---------------------------------------------------------------------------
+# SDK configuration
+# ---------------------------------------------------------------------------
+
+"""Configuration for SDK generation (mesh generate)."""
+type SDKConfig {
+  """Auto-generate SDK operations instead of using document files."""
+  generateOperations: GenerateOperationsConfig
+}
+
+"""Options for automatically generating SDK operations."""
+type GenerateOperationsConfig {
+  """Depth of selection sets in auto-generated operations. Default: 2."""
+  selectionSetDepth: Int
+}
+
+# ---------------------------------------------------------------------------
+# Sources and handlers
+# ---------------------------------------------------------------------------
+
+"""A named external data source connected to the mesh via a handler."""
+type Source {
+  """Unique name for this source used in the GraphQL context."""
+  name: String!
+
+  """
+  The handler that connects to the external data source and
+  converts it to a GraphQL schema.
+  """
+  handler: Handler!
+
+  """Transforms applied to this source schema before merging."""
+  transforms: [Transform!]
+}
+
+"""
+Handler configuration. Exactly one handler type should be specified.
+Each handler type converts a different API or database into a GraphQL schema.
+"""
+type Handler {
+  """
+  Remote or local GraphQL endpoint, code-first schema, or multiple HTTP endpoints.
+  """
+  graphql: JSON
+
+  """gRPC / Protocol Buffers service."""
+  grpc: GrpcHandler
+
+  """JSON Schema specification with explicit operation mappings."""
+  jsonSchema: JsonSchemaHandler
+
+  """MongoDB via Mongoose models."""
+  mongoose: MongooseHandler
+
+  """MySQL database."""
+  mysql: MySQLHandler
+
+  """Neo4j graph database."""
+  neo4j: Neo4JHandler
+
+  """OData v4 service."""
+  odata: ODataHandler
+
+  """OpenAPI / Swagger specification."""
+  openapi: OpenapiHandler
+
+  """PostgreSQL database via PostGraphile."""
+  postgraphile: PostGraphileHandler
+
+  """RAML specification."""
+  raml: RAMLHandler
+
+  """SOAP / WSDL web service."""
+  soap: SoapHandler
+
+  """Apollo Federation supergraph SDL."""
+  supergraph: SupergraphHandler
+
+  """Apache Thrift service."""
+  thrift: ThriftHandler
+
+  """SQLite database via TUQL."""
+  tuql: TuqlHandler
+}
+
+# ---------------------------------------------------------------------------
+# GraphQL handler
+# ---------------------------------------------------------------------------
+
+"""Handler for a remote GraphQL endpoint (HTTP)."""
+type GraphQLHandlerHTTPConfiguration {
+  """URL or file path to the remote GraphQL endpoint."""
+  endpoint: String!
+
+  """
+  HTTP headers sent only during schema introspection (not during operations).
+  """
+  schemaHeaders: JSON
+
+  """HTTP headers sent with every operation at runtime."""
+  operationHeaders: JSON
+
+  """When true, Query operations use HTTP GET instead of POST."""
+  useGETForQueries: Boolean
+
+  """HTTP method for GraphQL operations. Allowed: GET, POST. Default: POST."""
+  method: GraphQLHTTPMethod
+
+  """
+  Fetch credentials mode.
+  Default: same-origin. Allowed: omit, include.
+  """
+  credentials: GraphQLCredentials
+
+  """Path to a custom W3C WebSocket implementation."""
+  webSocketImpl: String
+
+  """Path to a separate introspection SDL or JSON file."""
+  source: String
+
+  """
+  Subscription transport protocol.
+  SSE: Server-Sent Events.
+  WS: graphql-ws (recommended).
+  LEGACY_WS: subscriptions-transport-ws.
+  """
+  subscriptionsProtocol: SubscriptionsProtocol
+
+  """Separate WebSocket endpoint for subscriptions."""
+  subscriptionsEndpoint: String
+
+  """Number of retry attempts on failure."""
+  retry: Int
+
+  """Request timeout in milliseconds."""
+  timeout: Int
+
+  """Enable automatic query batching to the upstream endpoint."""
+  batch: Boolean
+
+  """WebSocket connectionParams sent at runtime."""
+  connectionParams: JSON
+}
+
+enum GraphQLHTTPMethod {
+  GET
+  POST
+}
+
+enum GraphQLCredentials {
+  omit
+  include
+}
+
+enum SubscriptionsProtocol {
+  SSE
+  WS
+  LEGACY_WS
+}
+
+# ---------------------------------------------------------------------------
+# gRPC handler
+# ---------------------------------------------------------------------------
+
+"""Handler for gRPC and Protocol Buffer services."""
+type GrpcHandler {
+  """gRPC server endpoint (e.g., localhost:50051)."""
+  endpoint: String!
+
+  """
+  Path to a .proto file, binary-encoded descriptor set, or JSON descriptor set.
+  """
+  source: JSON
+
+  """Request timeout in milliseconds. Default: 200000."""
+  requestTimeout: Int
+
+  """SSL credentials for mutual TLS connections."""
+  credentialsSsl: GrpcCredentialsSsl
+
+  """Use HTTPS transport instead of HTTP for the gRPC channel."""
+  useHTTPS: Boolean
+
+  """gRPC metadata (headers) sent with each call."""
+  metaData: JSON
+
+  """Method name prefixes routed to Query (default: list, get)."""
+  prefixQueryMethod: [String!]
+
+  """
+  Explicit overrides mapping gRPC operations to Query or Mutation fields.
+  """
+  selectQueryOrMutationField: [SelectQueryOrMutationFieldConfig!]
+
+  """Headers sent during schema reflection."""
+  schemaHeaders: JSON
+}
+
+"""SSL/TLS credentials for gRPC connections."""
+type GrpcCredentialsSsl {
+  """Path to the root CA certificate file."""
+  rootCA: String
+
+  """Path to the certificate chain file."""
+  certChain: String
+
+  """Path to the private key file."""
+  privateKey: String
+}
+
+"""Maps a gRPC method to a GraphQL operation type."""
+type SelectQueryOrMutationFieldConfig {
+  """Target operation type. Allowed: query, mutation."""
+  type: OperationType!
+
+  """Name of the gRPC method field."""
+  fieldName: String!
+}
+
+enum OperationType {
+  query
+  mutation
+  Query
+  Mutation
+}
+
+# ---------------------------------------------------------------------------
+# JSON Schema handler
+# ---------------------------------------------------------------------------
+
+"""
+Handler for JSON Schema sources with explicit HTTP operation definitions.
+"""
+type JsonSchemaHandler {
+  """Path or URL to the base JSON Schema file."""
+  source: String
+
+  """Base URL for all HTTP operations."""
+  endpoint: String
+
+  """HTTP headers sent with every operation."""
+  operationHeaders: JSON
+
+  """HTTP headers sent during schema loading."""
+  schemaHeaders: JSON
+
+  """List of HTTP or PubSub operations derived from the JSON Schema."""
+  operations: [JSON]
+
+  """When true, HTTP error responses are ignored rather than thrown."""
+  ignoreErrorResponses: Boolean
+
+  """Default query parameters appended to all requests."""
+  queryParams: JSON
+
+  """Query string serialization options."""
+  queryStringOptions: QueryStringOptions
+
+  """HTTP request timeout in milliseconds."""
+  timeout: Int
+}
+
+"""Options for serializing query parameters into URL query strings."""
+type QueryStringOptions {
+  """
+  When true, array items include explicit indices (a[0]=b&a[1]=c).
+  Default: false (a=b&a=c).
+  """
+  indices: Boolean
+
+  """
+  Array serialization format.
+  Allowed: indices, brackets, repeat, comma.
+  """
+  arrayFormat: ArrayFormat
+
+  """
+  When true, single-item arrays append [] to enable round-trip parsing.
+  Only applicable when arrayFormat is comma.
+  """
+  commaRoundTrip: Boolean
+
+  """When true, nested objects are serialized as JSON strings."""
+  jsonStringify: Boolean
+}
+
+enum ArrayFormat {
+  indices
+  brackets
+  repeat
+  comma
+}
+
+# ---------------------------------------------------------------------------
+# Database handlers
+# ---------------------------------------------------------------------------
+
+"""Handler for MongoDB databases using Mongoose model definitions."""
+type MongooseHandler {
+  """MongoDB connection string (e.g., mongodb://localhost:27017/mydb)."""
+  connectionString: String
+
+  """List of Mongoose model definitions."""
+  models: [MongooseModel!]
+
+  """List of Mongoose discriminator definitions."""
+  discriminators: [MongooseModel!]
+}
+
+"""A Mongoose model used to generate GraphQL types and resolvers."""
+type MongooseModel {
+  """Name of the model as used in GraphQL."""
+  name: String!
+
+  """File path exporting the Mongoose model."""
+  path: String!
+
+  """Options passed to compose-mongoose."""
+  options: JSON
+}
+
+"""Handler for MySQL databases."""
+type MySQLHandler {
+  """MySQL host. Default: localhost."""
+  host: String
+
+  """MySQL port. Default: 3306."""
+  port: Int
+
+  """Database name."""
+  database: String
+
+  """MySQL username."""
+  user: String
+
+  """MySQL password."""
+  password: String
+
+  """SSL options for encrypted MySQL connections."""
+  ssl: MySQLSSLOptions
+
+  """Connection pool size. Default: 10."""
+  pool: Int
+
+  """
+  Limit applied to list queries.
+  Prevents unbounded result sets.
+  """
+  limit: Int
+
+  """Glob patterns for table names to include."""
+  tables: [String!]
+
+  """Custom type mappings from MySQL column types to GraphQL scalars."""
+  tableFields: [TableField!]
+}
+
+"""SSL configuration for MySQL connections."""
+type MySQLSSLOptions {
+  """Path to the CA certificate."""
+  ca: String
+
+  """Path to the client certificate."""
+  cert: String
+
+  """Path to the client private key."""
+  key: String
+}
+
+"""Override the GraphQL type for a specific MySQL column."""
+type TableField {
+  """MySQL table name."""
+  table: String!
+
+  """List of column-to-type overrides."""
+  fields: [String!]!
+}
+
+"""Handler for Neo4j graph databases."""
+type Neo4JHandler {
+  """Neo4j Bolt URL (e.g., bolt://localhost:7687)."""
+  url: String!
+
+  """Neo4j username."""
+  username: String!
+
+  """Neo4j password."""
+  password: String!
+
+  """Enable support for Neo4j Enterprise features."""
+  alwaysIncludeRelationships: Boolean
+
+  """Neo4j database name (Neo4j 4.x multi-database). Default: neo4j."""
+  database: String
+
+  """
+  URL of the Neo4j GraphQL Library introspection endpoint.
+  When set, schema is fetched from the remote rather than generated locally.
+  """
+  rawConfig: JSON
+}
+
+# ---------------------------------------------------------------------------
+# API handlers
+# ---------------------------------------------------------------------------
+
+"""Handler for OData v4 REST services."""
+type ODataHandler {
+  """URL of the OData service root (e.g., https://services.odata.org/V4/...)."""
+  endpoint: String!
+
+  """HTTP headers sent with every OData request."""
+  operationHeaders: JSON
+
+  """HTTP headers sent during schema metadata ($metadata) fetching."""
+  schemaHeaders: JSON
+
+  """
+  When true, the OData batch endpoint is used for multiple operations.
+  """
+  batch: JSON
+
+  """
+  When true, navigational properties are included in the schema even when
+  they are not explicitly referenced by $expand.
+  """
+  expandNavProps: Boolean
+}
+
+"""Handler for OpenAPI / Swagger 2.0 / OpenAPI 3.x specifications."""
+type OpenapiHandler {
+  """
+  URL or file path to the OpenAPI / Swagger specification.
+  Supports JSON and YAML.
+  """
+  source: JSON!
+
+  """HTTP headers sent with every runtime operation."""
+  operationHeaders: JSON
+
+  """HTTP headers sent during schema loading."""
+  schemaHeaders: JSON
+
+  """Base URL override for all API calls (overrides the spec's servers[0].url)."""
+  endpoint: String
+
+  """
+  Query string parameter name used for API key authentication.
+  When provided, the key is appended to every request URL.
+  """
+  queryParams: JSON
+
+  """
+  Qs library options used to serialize query string parameters.
+  """
+  queryStringOptions: QueryStringOptions
+
+  """
+  When false, enum values are not used as-is from the spec.
+  Default: true.
+  """
+  includeHttpDetails: Boolean
+
+  """
+  List of MIME types to accept.
+  Defaults to the spec's produces/consumes values.
+  """
+  selectQueryOrMutationField: [SelectQueryOrMutationFieldConfig!]
+}
+
+"""Handler for PostgreSQL databases via PostGraphile."""
+type PostGraphileHandler {
+  """
+  PostgreSQL connection string or pool configuration.
+  Example: postgres://user:pass@localhost:5432/dbname
+  """
+  connectionString: JSON
+
+  """PostgreSQL schemas to expose. Default: [public]."""
+  schemaName: [String!]
+
+  """Options forwarded directly to PostGraphile."""
+  options: JSON
+
+  """
+  When true, PostGraphile watches the database for schema changes and
+  updates the GraphQL schema dynamically.
+  """
+  watch: Boolean
+}
+
+"""Handler for RAML 1.0 API specifications."""
+type RAMLHandler {
+  """URL or file path to the RAML specification."""
+  ramlFilePath: String!
+
+  """Base URL override for all API calls."""
+  baseUrl: String
+
+  """HTTP headers sent with every runtime operation."""
+  operationHeaders: JSON
+
+  """HTTP headers sent during schema loading."""
+  schemaHeaders: JSON
+}
+
+"""Handler for SOAP / WSDL web services."""
+type SoapHandler {
+  """URL or file path to the WSDL document."""
+  wsdl: String!
+
+  """HTTP basic authentication credentials."""
+  basicAuth: SoapBasicAuth
+
+  """Security headers inserted into every SOAP request envelope."""
+  securityCert: SOAPHeaders
+
+  """HTTP headers sent with every SOAP request."""
+  operationHeaders: JSON
+
+  """HTTP headers sent when fetching the WSDL."""
+  schemaHeaders: JSON
+}
+
+"""HTTP basic authentication for SOAP services."""
+type SoapBasicAuth {
+  username: String!
+  password: String!
+}
+
+"""SOAP envelope security headers (WS-Security)."""
+type SOAPHeaders {
+  """Path to the username token username value."""
+  username: String
+
+  """Path to the username token password value."""
+  password: String
+
+  """Path to the private key file (PEM) for message signing."""
+  privateKey: String
+
+  """Path to the client certificate file (PEM) for message signing."""
+  privateKeyPath: String
+
+  """Path to the public certificate file (PEM) for message signing."""
+  publicCertKey: String
+
+  """Path to the public certificate file for encryption."""
+  publicCertKeyPath: String
+}
+
+"""Handler for an Apollo Federation supergraph SDL."""
+type SupergraphHandler {
+  """
+  URL, file path, or inline SDL of the composed Federation supergraph.
+  """
+  source: JSON!
+
+  """HTTP headers sent when fetching the supergraph from a remote URL."""
+  schemaHeaders: JSON
+
+  """Polling interval in milliseconds to refresh the supergraph."""
+  pollingInterval: Int
+
+  """
+  List of subgraph configurations used to connect each service.
+  """
+  subgraphs: [SubgraphConfiguration!]
+}
+
+"""Connection configuration for a single Federation subgraph service."""
+type SubgraphConfiguration {
+  """Name of the subgraph as declared in the supergraph SDL."""
+  name: String!
+
+  """Base URL of the subgraph's GraphQL endpoint."""
+  endpoint: String
+
+  """HTTP headers forwarded to this subgraph's endpoint."""
+  operationHeaders: JSON
+
+  """WebSocket endpoint for this subgraph's subscriptions."""
+  wsEndpoint: String
+
+  """Retry attempts when the subgraph is unavailable."""
+  retry: Int
+
+  """Request timeout in milliseconds."""
+  timeout: Int
+}
+
+"""Handler for Apache Thrift services (binary or compact protocol)."""
+type ThriftHandler {
+  """Host name of the Thrift server."""
+  hostName: String!
+
+  """Port of the Thrift server."""
+  port: Int!
+
+  """URL path prefix for Thrift HTTP requests."""
+  path: String
+
+  """
+  When true, use HTTPS for Thrift HTTP connections.
+  Default: false.
+  """
+  https: Boolean
+
+  """
+  Thrift protocol.
+  Allowed: binary, compact, json.
+  Default: binary.
+  """
+  protocol: ThriftProtocol
+
+  """Name of the Thrift service interface to expose."""
+  serviceName: String!
+
+  """HTTP operation headers."""
+  operationHeaders: JSON
+
+  """HTTP headers sent when fetching the Thrift IDL."""
+  schemaHeaders: JSON
+
+  """Path or URL to the Thrift IDL (.thrift) file."""
+  idl: String!
+}
+
+enum ThriftProtocol {
+  binary
+  compact
+  json
+}
+
+"""Handler for SQLite databases via TUQL."""
+type TuqlHandler {
+  """File path to the SQLite database."""
+  db: String
+
+  """
+  Path to a SQL file used to build an in-memory SQLite database.
+  Used for testing without a persistent file.
+  """
+  infile: String
+}
+
+# ---------------------------------------------------------------------------
+# Transforms
+# ---------------------------------------------------------------------------
+
+"""
+Schema transform applied either to a single source or to the composed schema.
+Exactly one transform type should be specified per entry.
+"""
+type Transform {
+  """Apply caching to specific resolver fields."""
+  cache: [CacheTransformConfig!]
+
+  """Wrap a source schema inside a named object type (namespace)."""
+  encapsulate: EncapsulateTransformObject
+
+  """Extend the schema with additional SDL type definitions."""
+  extend: ExtendTransform
+
+  """
+  Add Apollo Federation directives (@key, @external, @provides, @requires)
+  to types and fields.
+  """
+  federation: FederationTransform
+
+  """
+  Filter the schema to include or exclude specific types, fields, and arguments.
+  May be an inline object or a path to a configuration file.
+  """
+  filterSchema: JSON
+
+  """Hoist nested fields up to a parent type."""
+  hoistField: [HoistFieldTransformConfig!]
+
+  """Apply a naming convention (camelCase, PascalCase, etc.) to the schema."""
+  namingConvention: NamingConventionTransformConfig
+
+  """Add a prefix to type and field names to avoid conflicts."""
+  prefix: PrefixTransformConfig
+
+  """Remove unreachable types and unused fields from the schema."""
+  prune: PruneTransformConfig
+
+  """Apply rate limiting to specific resolver fields."""
+  rateLimit: [RateLimitTransformConfig!]
+
+  """
+  Rename types and fields.
+  May be an inline object or a path to a configuration file.
+  """
+  rename: JSON
+
+  """Replace fields with values or resolvers from other fields."""
+  replaceField: ReplaceFieldTransformConfig
+
+  """Compose resolvers with middleware-style wrappers."""
+  resolversComposition: JSON
+
+  """Transfer fields from one type to another."""
+  transferSchema: JSON
+
+  """Configure cross-service type merging (schema stitching)."""
+  typeMerging: TypeMergingConfig
+}
+
+"""Cache configuration applied to a specific field resolver."""
+type CacheTransformConfig {
+  """
+  Type and field selector. Supports wildcards.
+  Example: Query.* or Query.getUser
+  """
+  field: String!
+
+  """
+  Cache key template.
+  Default: {typeName}-{fieldName}-{argsHash}-{fieldNamesHash}.
+  Supports: {args.argName}, {typeName}, {fieldName}, {argsHash}, {fieldNamesHash}, {info}.
+  """
+  cacheKey: String
+
+  """Cache invalidation rules."""
+  invalidate: CacheInvalidateConfig
+}
+
+"""Rules for invalidating cache entries."""
+type CacheInvalidateConfig {
+  """When true, the cache entry is invalidated after the first read."""
+  effectingOperations: [CacheEffectingOperationConfig!]
+
+  """TTL in milliseconds after which the cache entry expires."""
+  ttl: Int
+}
+
+"""Invalidates a cache entry when a specific mutation field is executed."""
+type CacheEffectingOperationConfig {
+  """The mutation field that triggers cache invalidation (e.g., Mutation.updateUser)."""
+  operation: String!
+
+  """
+  The cache key to invalidate. Supports the same template variables as CacheTransformConfig.cacheKey.
+  """
+  matchKey: String
+}
+
+"""Wraps a source schema inside a namespace object type."""
+type EncapsulateTransformObject {
+  """
+  Name of the wrapping object type.
+  Default: the source name.
+  """
+  name: String
+
+  """Which root operation types to encapsulate."""
+  applyTo: EncapsulateTransformApplyTo
+}
+
+"""Root types to include in the encapsulate transform."""
+type EncapsulateTransformApplyTo {
+  """Encapsulate Query fields. Default: true."""
+  query: Boolean
+
+  """Encapsulate Mutation fields. Default: true."""
+  mutation: Boolean
+
+  """Encapsulate Subscription fields. Default: true."""
+  subscription: Boolean
+}
+
+"""Extends the schema with additional inline SDL type definitions."""
+type ExtendTransform {
+  """SDL string or file path containing additional type definitions."""
+  typeDefs: JSON
+
+  """Additional resolver map or path to a resolver file."""
+  resolvers: JSON
+}
+
+"""Adds Apollo Federation directives to types and fields."""
+type FederationTransform {
+  """Per-type Federation directive configurations."""
+  types: [FederationTransformType!]
+}
+
+"""Federation directive configuration for a single type."""
+type FederationTransformType {
+  """Name of the GraphQL type to annotate."""
+  name: String!
+
+  """Federation configuration for this type."""
+  config: FederationObjectConfig
+}
+
+"""Federation annotations for an object type."""
+type FederationObjectConfig {
+  """@key directive selection sets that identify entity instances."""
+  keyFields: [String!]
+
+  """Whether this type extends an entity defined in another subgraph."""
+  extend: Boolean
+
+  """
+  Marks external fields (defined in another subgraph).
+  """
+  external: Boolean
+
+  """Fields configuration for @requires, @provides, and @external."""
+  fields: [FederationField!]
+
+  """Resolver configuration for the __resolveReference function."""
+  resolveReference: JSON
+}
+
+"""Federation field-level annotation."""
+type FederationField {
+  """Name of the field."""
+  name: String!
+
+  """Field-level Federation directives."""
+  config: FederationFieldConfig
+}
+
+"""Federation directives applied to a single field."""
+type FederationFieldConfig {
+  """@external — this field is defined in another subgraph."""
+  external: Boolean
+
+  """@provides — selection set of fields this resolver provides."""
+  provides: String
+
+  """@requires — selection set this field requires from the base type."""
+  requires: String
+
+  """@tag — federation tag annotation."""
+  tag: String
+
+  """@override — migrate this field from another subgraph."""
+  override: String
+}
+
+"""Hoists nested fields to a parent type."""
+type HoistFieldTransformConfig {
+  """Source type containing the field to hoist."""
+  typeName: String!
+
+  """Path of field names from the source type to the target field."""
+  pathConfig: [JSON!]!
+
+  """Name of the field created on the parent type."""
+  newFieldName: String!
+
+  """
+  When true, arguments from intermediate fields are preserved on the hoisted field.
+  """
+  filterArgsInPath: Boolean
+}
+
+"""Applies a naming convention to schema type and field names."""
+type NamingConventionTransformConfig {
+  """
+  Convention for type names.
+  Example: PascalCase, camelCase, snake_case, upper_case, lower_case.
+  """
+  typeNames: String
+
+  """Convention for field names."""
+  fieldNames: String
+
+  """Convention for enum values."""
+  enumValues: String
+
+  """Convention for field arguments."""
+  fieldArgumentNames: String
+}
+
+"""Adds a prefix to type and/or field names."""
+type PrefixTransformConfig {
+  """Prefix string to prepend."""
+  value: String
+
+  """
+  When true, applies the prefix to field names as well as type names.
+  Default: false.
+  """
+  includeRootOperations: Boolean
+
+  """Type names to exclude from prefixing."""
+  ignore: [String!]
+
+  """
+  When true, the source name is used as the prefix instead of `value`.
+  """
+  mode: PrefixMode
+}
+
+enum PrefixMode {
+  wrap
+  bare
+}
+
+"""Removes unreachable or unused schema elements."""
+type PruneTransformConfig {
+  """Type names to skip during pruning."""
+  skipPruning: [String!]
+
+  """When true, removes types with no fields remaining after filtering."""
+  skipEmptyCompositeTypePruning: Boolean
+
+  """When true, unused union members are removed."""
+  skipUnusedTypesPruning: Boolean
+
+  """When true, implementation types of unused interfaces are kept."""
+  skipProtoInterfaces: Boolean
+}
+
+"""Applies rate limiting to a specific field resolver."""
+type RateLimitTransformConfig {
+  """Type and field selector (e.g., Query.search)."""
+  type: String!
+
+  """Field name on the selected type."""
+  field: String!
+
+  """Maximum number of requests allowed within the time window."""
+  max: Int!
+
+  """Time window duration in milliseconds."""
+  ttl: Int!
+
+  """Identifier template for the rate limit bucket (e.g., {context.userId})."""
+  identifier: String!
+}
+
+"""Replaces a field's type or resolver with another field's value or resolver."""
+type ReplaceFieldTransformConfig {
+  """
+  Type definitions to inject (usually Input types) that are not in
+  the original schema but are needed for replacement fields.
+  """
+  typeDefs: String
+
+  """List of field replacement rules."""
+  replacements: [ReplaceFieldTransformObject!]
+
+  """
+  When true, the original field's type is kept and only the resolver is replaced.
+  """
+  scope: String
+}
+
+"""A single field replacement rule."""
+type ReplaceFieldTransformObject {
+  """The type whose field is being replaced."""
+  from: ReplaceFieldConfig!
+
+  """The source type and field providing the replacement."""
+  to: ReplaceFieldConfig!
+
+  """Scope of the replacement: config, hoistValue."""
+  scope: String
+
+  """Mapping of arguments from the target resolver to the source resolver."""
+  composer: String
+
+  """Name override for the replaced field."""
+  name: String
+}
+
+"""Identifies a type/field pair in a replacement rule."""
+type ReplaceFieldConfig {
+  """Name of the type."""
+  type: String!
+
+  """Name of the field."""
+  field: String!
+}
+
+# ---------------------------------------------------------------------------
+# Type merging (schema stitching)
+# ---------------------------------------------------------------------------
+
+"""Configures schema stitching type-merging for a set of types."""
+type TypeMergingConfig {
+  """
+  Global query field to use when merging all types (optional shorthand).
+  """
+  queryFields: [MergedRootFieldConfig!]
+
+  """Per-type merging configuration."""
+  types: [MergedTypeConfig!]
+}
+
+"""Merging configuration for a single type."""
+type MergedTypeConfig {
+  """Name of the type. Default: Query."""
+  typeName: String
+
+  """Selection set that identifies a unique instance of this type."""
+  key: KeyAnnotation
+
+  """
+  When true, this subschema provides the canonical definition for overlapping
+  fields.
+  """
+  canonical: Boolean
+
+  """Field-level merging annotations."""
+  fields: [MergedTypeField!]
+}
+
+"""Selects the key fields required to merge a type across subschemas."""
+type KeyAnnotation {
+  """
+  GraphQL selection set string.
+  Example: "{ id }"
+  """
+  selectionSet: String!
+}
+
+"""Field-level annotation for computed merging fields."""
+type MergedTypeField {
+  """Name of the field."""
+  fieldName: String!
+
+  """Computed field dependencies from other subschemas."""
+  computed: ComputedAnnotation
+}
+
+"""Specifies fields from other subschemas required to compute this field."""
+type ComputedAnnotation {
+  """
+  GraphQL selection set of fields required from other subschemas.
+  Example: "{ price currency }"
+  """
+  selectionSet: String!
+}
+
+"""Root field configuration for type-merge queries."""
+type MergedRootFieldConfig {
+  """Query field name that fetches entities by key."""
+  queryFieldName: String!
+
+  """Field on the entity object used as the merge key."""
+  keyField: String
+
+  """Argument name that receives the merge key."""
+  keyArg: String
+
+  """Additional static arguments appended to the merge query."""
+  additionalArgs: String
+
+  """Advanced: custom key extraction from the @key selection set."""
+  key: [String!]
+
+  """
+  Advanced: expression template for constructing input arguments.
+  Example: "input: { keys: [[$key]] }"
+  """
+  argsExpr: String
+}
+
+# ---------------------------------------------------------------------------
+# Additional resolvers (stitching)
+# ---------------------------------------------------------------------------
+
+"""Stitching resolver that delegates to a field in another source."""
+type AdditionalStitchingResolverObject {
+  """Name of the source that owns the target field."""
+  sourceName: String!
+
+  """Type in the source schema."""
+  sourceTypeName: String!
+
+  """Field in the source schema to delegate to."""
+  sourceFieldName: String!
+
+  """Selection set forwarded to the source field."""
+  sourceSelectionSet: String
+
+  """Selection set required from the root type before delegation."""
+  requiredSelectionSet: String
+
+  """Static arguments passed to the source field."""
+  sourceArgs: JSON
+
+  """The type in the target (composed) schema."""
+  targetTypeName: String!
+
+  """The field in the target schema being resolved."""
+  targetFieldName: String!
+
+  """Return type of the result (result or results)."""
+  returnData: String
+}
+
+"""Batch stitching resolver (fetches multiple keys in one call)."""
+type AdditionalStitchingBatchResolverObject {
+  """Source name."""
+  sourceName: String!
+
+  """Source type name."""
+  sourceTypeName: String!
+
+  """Source field name (must accept a list of keys)."""
+  sourceFieldName: String!
+
+  """Selection set forwarded to the source."""
+  sourceSelectionSet: String
+
+  """Selection set required from the root type."""
+  requiredSelectionSet: String
+
+  """Static args passed to the source field."""
+  sourceArgs: JSON
+
+  """Target type in the composed schema."""
+  targetTypeName: String!
+
+  """Target field in the composed schema."""
+  targetFieldName: String!
+
+  """
+  Key field on the source entities used to match batch results
+  back to individual items.
+  """
+  keysArg: String!
+
+  """Field on the parent type used as the batch lookup key."""
+  keyField: String!
+}
+
+"""Additional subscription resolver object for stitching."""
+type AdditionalSubscriptionObject {
+  """Target type in the composed schema."""
+  targetTypeName: String!
+
+  """Target field in the composed schema."""
+  targetFieldName: String!
+
+  """Source name providing the subscription."""
+  sourceName: String!
+
+  """Source type name."""
+  sourceTypeName: String!
+
+  """Source field name (must be a Subscription field)."""
+  sourceFieldName: String!
+
+  """Arguments passed to the source subscription field."""
+  sourceArgs: JSON
+
+  """Field on the subscription result returned to the subscriber."""
+  result: String
+
+  """Filter expression evaluated per subscription event."""
+  filterBy: String
+}
+
+# ---------------------------------------------------------------------------
+# Caching
+# ---------------------------------------------------------------------------
+
+"""
+Cache backend configuration.
+Exactly one backend should be specified.
+"""
+type Cache {
+  """Cloudflare Workers KV namespace."""
+  cfwKv: CFWorkersKVCacheConfig
+
+  """Local filesystem cache."""
+  file: FileCacheConfig
+
+  """Browser-side Localforage cache (IndexedDB / WebSQL / localStorage)."""
+  localforage: LocalforageConfig
+
+  """Redis cache (single instance, sentinel cluster, or node cluster)."""
+  redis: JSON
+}
+
+"""Cloudflare Workers KV cache configuration."""
+type CFWorkersKVCacheConfig {
+  """Name of the KV namespace binding configured in wrangler.toml."""
+  namespace: String!
+}
+
+"""Filesystem cache configuration."""
+type FileCacheConfig {
+  """Directory path where cache files are stored. Default: .mesh/cache."""
+  path: String
+}
+
+"""Localforage (browser) cache configuration."""
+type LocalforageConfig {
+  """Storage drivers in preference order. Allowed: WEBSQL, INDEXEDDB, LOCALSTORAGE."""
+  driver: [LocalforageDriver!]
+
+  """Database name."""
+  name: String
+
+  """Database version."""
+  version: Float
+
+  """Maximum database size in bytes (WebSQL only)."""
+  size: Int
+
+  """Store name within the database."""
+  storeName: String
+
+  """Human-readable description."""
+  description: String
+}
+
+enum LocalforageDriver {
+  WEBSQL
+  INDEXEDDB
+  LOCALSTORAGE
+}
+
+"""Redis single-instance connection configuration."""
+type RedisConfigSingle {
+  host: String
+  port: String
+  username: String
+  password: String
+
+  """Database index (0–15)."""
+  db: Int
+
+  """Redis connection URL (redis://... or rediss://...)."""
+  url: String
+
+  """IP address family. 4 for IPv4, 6 for IPv6."""
+  family: String
+
+  """
+  When true, the connection is deferred until the first command.
+  Default: true.
+  """
+  lazyConnect: Boolean
+}
+
+"""Redis Sentinel cluster configuration."""
+type RedisConfigSentinel {
+  """Sentinel group name."""
+  name: String!
+
+  """Password for Sentinel instances."""
+  sentinelPassword: String
+
+  """List of Sentinel nodes."""
+  sentinels: [RedisSentinelConfig!]!
+
+  """Role to connect to. Allowed: master, slave. Default: master."""
+  role: RedisRole
+
+  """Whether Sentinel connections use TLS."""
+  enableTLSForSentinelMode: Boolean
+
+  """Deferred connection. Default: true."""
+  lazyConnect: Boolean
+}
+
+"""A single Redis Sentinel node."""
+type RedisSentinelConfig {
+  host: String!
+  port: String!
+  family: String
+}
+
+enum RedisRole {
+  master
+  slave
+}
+
+"""Redis Cluster configuration."""
+type RedisConfigCluster {
+  """Startup nodes for cluster discovery."""
+  startupNodes: [RedisSentinelConfig!]!
+  username: String
+  password: String
+  db: Int
+  lazyConnect: Boolean
+
+  """
+  When true, DNS lookup results are used as-is (required for AWS Elasticache TLS).
+  """
+  dnsLookupAsIs: Boolean
+
+  """Enable TLS for cluster connections."""
+  tls: Boolean
+}
+
+# ---------------------------------------------------------------------------
+# PubSub
+# ---------------------------------------------------------------------------
+
+"""PubSub provider configuration for subscription support."""
+type PubSubConfig {
+  """
+  PubSub package name (e.g., @graphql-mesh/pubsub-redis).
+  """
+  name: String!
+
+  """Provider-specific configuration options."""
+  config: JSON
+}
+
+# ---------------------------------------------------------------------------
+# Persisted operations
+# ---------------------------------------------------------------------------
+
+"""Configuration for the persisted operations security feature."""
+type PersistedOperationsConfig {
+  """
+  When true, arbitrary (non-persisted) operations are permitted.
+  Default: false.
+  """
+  allowArbitraryOperations: Boolean
+
+  """When true, persisted operation documents skip SDL validation."""
+  skipDocumentValidation: Boolean
+
+  """Custom error messages returned when validation fails."""
+  customErrors: CustomPersistedQueryErrors
+}
+
+"""Custom error messages for persisted operation validation failures."""
+type CustomPersistedQueryErrors {
+  """Error returned when the persisted operation document is not found."""
+  notFound: String
+
+  """Error returned when a non-persisted operation is sent and not allowed."""
+  persistedQueryOnly: String
+
+  """Error returned when the persisted operation key cannot be extracted."""
+  keyNotFound: String
+}
+
+# ---------------------------------------------------------------------------
+# Plugins
+# ---------------------------------------------------------------------------
+
+"""
+Mesh plugin configuration.
+Exactly one plugin type should be specified per entry.
+"""
+type Plugin {
+  """Mask internal error details in production responses."""
+  maskedErrors: MaskedErrorsPluginConfig
+
+  """
+  When present, introspection queries are resolved immediately without
+  hitting upstream sources.
+  """
+  immediateIntrospection: JSON
+
+  """
+  When present, identical in-flight requests are deduplicated.
+  """
+  deduplicateRequest: JSON
+
+  """GraphQL Hive schema registry and usage reporting integration."""
+  hive: HivePlugin
+
+  """HTTP response caching at the transport level (CDN-friendly headers)."""
+  httpCache: HTTPCachePlugin
+
+  """Expose upstream HTTP response metadata as extensions in GraphQL responses."""
+  httpDetailsExtensions: HTTPDetailsExtensionsConfig
+
+  """GraphQL Live Queries support."""
+  liveQuery: LiveQueryConfig
+
+  """Schema mocking for development and testing."""
+  mock: MockingConfig
+
+  """New Relic APM integration."""
+  newrelic: NewrelicConfig
+
+  """Per-operation field-level permission enforcement."""
+  operationFieldPermissions: OperationFieldPermissionsConfig
+
+  """Rate limiting at the plugin level."""
+  rateLimit: RateLimitPluginConfig
+
+  """GraphQL response caching with automatic cache invalidation."""
+  responseCache: ResponseCacheConfig
+
+  """Save operation snapshots to disk for testing and debugging."""
+  snapshot: SnapshotPluginConfig
+
+  """StatsD metrics reporting."""
+  statsd: StatsdPlugin
+
+  """Prometheus metrics endpoint."""
+  prometheus: PrometheusConfig
+}
+
+"""Masked errors plugin configuration."""
+type MaskedErrorsPluginConfig {
+  """Message substituted for internal error details. Default: Unexpected error."""
+  errorMessage: String
+}
+
+"""GraphQL Hive schema registry and usage reporting plugin."""
+type HivePlugin {
+  """
+  Enable or disable the plugin.
+  Accepts a boolean or an expression string (e.g., process.env.HIVE_ENABLED).
+  """
+  enabled: JSON
+
+  """Hive access token for usage reporting."""
+  token: String
+
+  """Hive agent (HTTP sender) options."""
+  agent: HiveAgentOptions
+
+  """Usage reporting configuration."""
+  usage: HiveUsageOptions
+
+  """Schema reporting configuration."""
+  reporting: HiveReportingOptions
+
+  """Self-hosted Hive instance configuration."""
+  selfHosting: HiveSelfHostingOptions
+
+  """Persisted documents configuration."""
+  persistedDocuments: HivePersistedDocumentsConfiguration
+}
+
+"""Hive agent HTTP sender configuration."""
+type HiveAgentOptions {
+  """Agent name sent with reports."""
+  name: String
+
+  """Custom logger implementation."""
+  logger: JSON
+
+  """Custom fetch implementation."""
+  fetch: JSON
+
+  """HTTP timeout in milliseconds. Default: 30000."""
+  timeout: Int
+
+  """Maximum retry attempts. Default: 5."""
+  maxRetries: Int
+
+  """Minimum report size before flushing. Default: 200."""
+  minReportSize: Int
+
+  """Maximum report size before flushing."""
+  maxSize: Int
+
+  """Report flush interval in milliseconds."""
+  sendInterval: Int
+}
+
+"""Hive usage reporting options."""
+type HiveUsageOptions {
+  """
+  Enable or disable usage reporting.
+  Default: true.
+  """
+  enabled: JSON
+
+  """
+  Sample rate for usage reporting (0.0 – 1.0).
+  Default: 1.0.
+  """
+  sampleRate: Float
+
+  """
+  When true, operation details (arguments, variables) are not included in usage reports.
+  """
+  processVariables: Boolean
+
+  """Fields excluded from usage reporting."""
+  exclude: [String!]
+
+  """Key:value tags attached to usage reports."""
+  clientInfo: HiveClientInfo
+}
+
+"""Client metadata attached to usage reports."""
+type HiveClientInfo {
+  """Client name (e.g., my-app)."""
+  name: String
+
+  """Client version (e.g., 1.0.0)."""
+  version: String
+}
+
+"""Hive schema reporting options."""
+type HiveReportingOptions {
+  """Enable or disable schema reporting. Default: true."""
+  enabled: JSON
+
+  """Author of the schema report (e.g., a CI user name)."""
+  author: String
+
+  """Commit SHA or version identifier for the schema report."""
+  commit: String
+
+  """Service name for federated schema reporting."""
+  serviceName: String
+
+  """Service URL for federated schema reporting."""
+  serviceUrl: String
+}
+
+"""Self-hosted Hive instance endpoint configuration."""
+type HiveSelfHostingOptions {
+  """Endpoint for usage reporting."""
+  usageEndpoint: String
+
+  """Endpoint for schema reporting."""
+  reportingEndpoint: String
+
+  """Endpoint for persisted documents."""
+  graphqlEndpoint: String
+}
+
+"""Hive persisted documents configuration."""
+type HivePersistedDocumentsConfiguration {
+  """
+  When true, only persisted documents are accepted.
+  """
+  allowArbitraryDocuments: Boolean
+
+  """CDN configuration for fetching persisted documents."""
+  cdn: HivePersistedDocumentsConfigurationCDN
+}
+
+"""CDN endpoint for Hive persisted documents."""
+type HivePersistedDocumentsConfigurationCDN {
+  """CDN URL prefix for persisted document lookups."""
+  endpoint: String!
+
+  """CDN access key."""
+  accessToken: String!
+}
+
+"""HTTP cache plugin (Sofa/Yoga transport-level response caching)."""
+type HTTPCachePlugin {
+  """URL patterns controlling which responses are cached."""
+  matches: [URLPatternObj!]
+}
+
+"""A URL pattern for HTTP cache matching."""
+type URLPatternObj {
+  """Regex or glob pattern matched against the request URL."""
+  match: String!
+
+  """Cache TTL in seconds for matched URLs."""
+  ttl: Int
+}
+
+"""Expose upstream HTTP response metadata in GraphQL response extensions."""
+type HTTPDetailsExtensionsConfig {
+  """When true, only failed upstream requests are included in extensions."""
+  if: JSON
+}
+
+"""GraphQL Live Queries plugin configuration."""
+type LiveQueryConfig {
+  """List of live query invalidation rules."""
+  invalidations: [LiveQueryInvalidation!]
+}
+
+"""A single live query invalidation rule."""
+type LiveQueryInvalidation {
+  """
+  Mutation field that triggers invalidation (e.g., Mutation.updatePost).
+  """
+  field: String!
+
+  """
+  Resource identifier templates that are invalidated by this mutation.
+  Supports {args.id} interpolation.
+  """
+  invalidate: [String!]!
+}
+
+"""Schema mocking configuration."""
+type MockingConfig {
+  """
+  Enable or disable mocking.
+  Accepts a boolean or an expression string.
+  """
+  if: JSON
+
+  """When true, mocking is preserved even when an upstream source is available."""
+  preserveResolvers: Boolean
+
+  """Mocked scalar values and type-level resolvers."""
+  mocks: [MockingFieldConfig!]
+
+  """
+  Path to a JavaScript file exporting a store factory for stateful mocks.
+  """
+  store: JSON
+}
+
+"""Mock configuration for a specific type or field."""
+type MockingFieldConfig {
+  """
+  Fully-qualified field path (e.g., Query.users or User.email).
+  Supports type-level mocking when only the type name is given.
+  """
+  apply: String!
+
+  """
+  When true, this field is mocked even when a real resolver is available.
+  """
+  if: JSON
+
+  """
+  Static mock value returned for this field.
+  May be a scalar, object, or array.
+  """
+  faker: String
+
+  """
+  Faker.js template string for generating realistic mock data.
+  Example: "{{name.firstName}} {{name.lastName}}"
+  """
+  custom: String
+
+  """
+  Path to a JavaScript file exporting a custom mock resolver function.
+  """
+  updateStore: [UpdateMockStoreConfig!]
+
+  """Operations that update the mock store state."""
+  store: GetFromMockStoreConfig
+}
+
+"""Reads a value from the mock store."""
+type GetFromMockStoreConfig {
+  """Type name in the mock store."""
+  type: String
+
+  """Field name in the mock store type."""
+  key: String
+
+  """Key value identifying the record."""
+  fieldName: String
+}
+
+"""Writes a value to the mock store."""
+type UpdateMockStoreConfig {
+  """Type name in the mock store."""
+  type: String
+
+  """Field argument used as the store key."""
+  key: String
+
+  """Field name to update in the store."""
+  fieldName: String
+
+  """Value to write (supports {args.value} interpolation)."""
+  value: String
+}
+
+"""New Relic APM integration configuration."""
+type NewrelicConfig {
+  """Include raw GraphQL document in traces. Default: false."""
+  includeDocument: Boolean
+
+  """Include resolved field paths in traces. Default: false."""
+  includeResolverArgs: Boolean
+
+  """Include error details in traces. Default: true."""
+  includeRawResult: Boolean
+
+  """Track resolver timings. Default: true."""
+  trackResolvers: Boolean
+
+  """Include operation arguments in traces. Default: false."""
+  includeOperationDocument: Boolean
+
+  """
+  Skip reporting operations whose name matches these patterns.
+  """
+  skipList: [String!]
+}
+
+"""Operation-level field permission enforcement."""
+type OperationFieldPermissionsConfig {
+  """List of permission rules applied per operation."""
+  permissions: [OperationFieldPermission!]
+}
+
+"""A single operation field permission rule."""
+type OperationFieldPermission {
+  """Operation name this rule applies to. "*" matches all operations."""
+  operationName: String!
+
+  """
+  Field paths allowed for this operation.
+  Example: ["Query.users", "User.email"]
+  """
+  allow: [String!]!
+}
+
+"""Plugin-level rate limiting configuration."""
+type RateLimitPluginConfig {
+  """Maximum number of requests per identifier per window."""
+  max: Int
+
+  """Time window in milliseconds."""
+  ttl: Int
+
+  """Identifier template. Example: {context.request.headers.x-api-key}."""
+  identifier: String
+
+  """When provided, the rate limit store is Redis-backed."""
+  rateLimitedByDefault: Boolean
+}
+
+"""GraphQL response caching plugin configuration."""
+type ResponseCacheConfig {
+  """
+  Global TTL in milliseconds.
+  Default: indefinite (until manually invalidated).
+  """
+  ttl: Int
+
+  """Per-type TTL overrides."""
+  ttlPerType: [ResponseCacheTTLConfig!]
+
+  """Per-schema-coordinate TTL overrides."""
+  ttlPerSchemaCoordinate: [ResponseCacheTTLConfig!]
+
+  """
+  When true, responses include the X-GraphQL-Event-Id header for invalidation.
+  """
+  includeExtensionMetadata: Boolean
+
+  """
+  Session identifier template controlling per-user cache partitioning.
+  Example: {context.userId}
+  """
+  session: JSON
+
+  """
+  When true, cache entries are shared across all sessions (public cache).
+  """
+  enabled: JSON
+
+  """Cache backend (defaults to the mesh-level cache)."""
+  cache: JSON
+
+  """Identifier template for the cache key."""
+  idFields: [String!]
+
+  """
+  Fields that, when present in a query, bypass the cache.
+  """
+  ignoredTypes: [String!]
+}
+
+"""TTL override for a specific type or schema coordinate."""
+type ResponseCacheTTLConfig {
+  """Type name or schema coordinate (e.g., Query.user or User)."""
+  coordinate: String!
+
+  """TTL in milliseconds for this coordinate."""
+  ttl: Int!
+}
+
+"""Snapshot plugin — saves operation snapshots to disk for testing."""
+type SnapshotPluginConfig {
+  """Glob patterns matching operation names to snapshot."""
+  apply: [String!]!
+
+  """Directory path where snapshot files are written."""
+  outputDirectory: String!
+
+  """
+  When true, existing snapshots are overwritten.
+  Default: false.
+  """
+  updateSnapshots: Boolean
+}
+
+"""StatsD metrics reporting plugin."""
+type StatsdPlugin {
+  """StatsD client configuration."""
+  client: StatsdClientConfiguration
+}
+
+"""StatsD client connection configuration."""
+type StatsdClientConfiguration {
+  """StatsD server host. Default: localhost."""
+  host: String
+
+  """StatsD server port. Default: 8125."""
+  port: Int
+
+  """
+  Metric name prefix prepended to all reported metrics.
+  Default: graphql_mesh.
+  """
+  prefix: String
+
+  """
+  Tag format.
+  Allowed: datadog, graphite, influx.
+  """
+  tagFormat: StatsTagFormat
+
+  """Fixed tags appended to all metrics."""
+  tags: [JSON!]
+
+  """Buffer size for metric batching."""
+  bufferHolder: StatsdClientBufferHolder
+}
+
+enum StatsTagFormat {
+  datadog
+  graphite
+  influx
+}
+
+"""Buffer configuration for StatsD metric batching."""
+type StatsdClientBufferHolder {
+  """Maximum number of bytes per UDP packet before flushing."""
+  buffer: String
+}
+
+"""Prometheus metrics endpoint configuration."""
+type PrometheusConfig {
+  """
+  Path for the Prometheus /metrics endpoint.
+  Default: /metrics.
+  """
+  endpoint: String
+
+  """When true, reports fetch duration histograms."""
+  fetchDuration: Boolean
+
+  """When true, reports request duration histograms."""
+  requestDuration: Boolean
+
+  """When true, reports request count metrics."""
+  requestCount: Boolean
+
+  """When true, reports error count metrics."""
+  requestTotalDuration: Boolean
+
+  """
+  When true, the GraphQL operation name is included as a metric label.
+  """
+  parse: Boolean
+
+  """When true, reports schema validation duration."""
+  validate: Boolean
+
+  """When true, reports resolver duration histograms."""
+  contextBuilding: Boolean
+
+  """When true, reports per-field resolver duration."""
+  execute: Boolean
+
+  """When true, reports per-field resolver error counts."""
+  errors: Boolean
+
+  """Metric name prefix. Default: graphql_mesh."""
+  prefix: String
+
+  """Fixed labels appended to all metrics."""
+  labels: JSON
+}
+
+# ---------------------------------------------------------------------------
+# Query type (introspection of mesh configuration — meta API)
+# ---------------------------------------------------------------------------
+
+"""
+The Query type exposes introspection of the Mesh configuration itself.
+This is the meta-level schema describing the gateway configuration structure.
+The actual composed schema served by a running Mesh gateway is generated
+from the configured sources and reflects the unified API surface.
+"""
+type Query {
+  """Returns documentation about the Mesh configuration schema version."""
+  meshConfigVersion: String
+
+  """
+  Placeholder query required by GraphQL SDL specification.
+  In a running gateway, the Query type reflects the composed source schemas.
+  """
+  _meshSchemaInfo: MeshSchemaInfo
+}
+
+"""Metadata about the running Mesh gateway schema."""
+type MeshSchemaInfo {
+  """The merge strategy used (stitching, bare, or federation)."""
+  merger: String
+
+  """Names of the configured data sources."""
+  sources: [String!]
+
+  """Whether the GraphiQL playground is enabled."""
+  playgroundEnabled: Boolean
+
+  """The GraphQL endpoint path."""
+  endpoint: String
+}

@@ -1,0 +1,164 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Report",
+  "description": "GraphQL Hive usage report v2 payload for submitting operation execution data for observability and analytics.",
+  "additionalProperties": false,
+  "type": "object",
+  "properties": {
+    "size": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Total number of operations included in this report."
+    },
+    "map": {
+      "type": "object",
+      "description": "Map of operation hash keys to operation map records.",
+      "patternProperties": {
+        "^(.*)$": {
+          "title": "OperationMapRecord",
+          "additionalProperties": false,
+          "type": "object",
+          "properties": {
+            "operation": {
+              "type": "string",
+              "description": "The raw GraphQL operation document string."
+            },
+            "operationName": {
+              "type": "string",
+              "description": "The name of the GraphQL operation, if named."
+            },
+            "fields": {
+              "minItems": 1,
+              "type": "array",
+              "description": "List of type.field paths accessed by this operation.",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": ["operation", "fields"]
+        }
+      }
+    },
+    "operations": {
+      "type": "array",
+      "description": "List of individual request operation executions.",
+      "items": {
+        "title": "RequestOperation",
+        "additionalProperties": false,
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Unix epoch timestamp (milliseconds) when the operation was executed."
+          },
+          "operationMapKey": {
+            "type": "string",
+            "description": "Key referencing the operation in the map object."
+          },
+          "execution": {
+            "title": "Execution",
+            "additionalProperties": false,
+            "type": "object",
+            "description": "Execution result statistics for the operation.",
+            "properties": {
+              "ok": {
+                "type": "boolean",
+                "description": "Whether the operation executed successfully without errors."
+              },
+              "duration": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Total execution duration in nanoseconds."
+              },
+              "errorsTotal": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Total number of GraphQL errors returned."
+              }
+            },
+            "required": ["ok", "duration", "errorsTotal"]
+          },
+          "metadata": {
+            "title": "Metadata",
+            "additionalProperties": false,
+            "type": "object",
+            "description": "Optional metadata about the client making the request.",
+            "properties": {
+              "client": {
+                "title": "Client",
+                "additionalProperties": false,
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Client application name."
+                  },
+                  "version": {
+                    "type": "string",
+                    "description": "Client application version."
+                  }
+                },
+                "required": ["name", "version"]
+              }
+            }
+          },
+          "persistedDocumentHash": {
+            "type": "string",
+            "title": "PersistedDocumentHash",
+            "description": "Hash identifier for a persisted document, in format orgSlug~appName~documentHash.",
+            "pattern": "^[a-zA-Z0-9_-]{1,64}~[a-zA-Z0-9._-]{1,64}~([A-Za-z]|[0-9]|_){1,128}$"
+          }
+        },
+        "required": ["timestamp", "operationMapKey", "execution"]
+      }
+    },
+    "subscriptionOperations": {
+      "type": "array",
+      "description": "List of subscription operation executions.",
+      "items": {
+        "title": "SubscriptionOperation",
+        "additionalProperties": false,
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Unix epoch timestamp (milliseconds) when the subscription was established."
+          },
+          "operationMapKey": {
+            "type": "string",
+            "description": "Key referencing the subscription operation in the map object."
+          },
+          "metadata": {
+            "title": "Metadata",
+            "additionalProperties": false,
+            "type": "object",
+            "description": "Optional metadata about the client making the subscription request.",
+            "properties": {
+              "client": {
+                "title": "Client",
+                "additionalProperties": false,
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Client application name."
+                  },
+                  "version": {
+                    "type": "string",
+                    "description": "Client application version."
+                  }
+                },
+                "required": ["name", "version"]
+              }
+            }
+          }
+        },
+        "required": ["timestamp", "operationMapKey"]
+      }
+    }
+  },
+  "required": ["size", "map"]
+}

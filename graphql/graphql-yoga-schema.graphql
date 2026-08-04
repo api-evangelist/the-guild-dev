@@ -1,0 +1,359 @@
+"""
+GraphQL Yoga — GraphQL SDL representation of server configuration types, plugin interfaces,
+and context shape derived from the graphql-yoga TypeScript source.
+
+Source: https://github.com/dotansimha/graphql-yoga
+  packages/graphql-yoga/src/types.ts
+  packages/graphql-yoga/src/server.ts
+  packages/graphql-yoga/src/schema.ts
+  packages/graphql-yoga/src/plugins/types.ts
+  packages/plugins/persisted-operations/src/index.ts
+
+GraphQL Yoga is a library, not a hosted service. Every deployment exposes its own
+/graphql endpoint (configurable). The types below describe the server configuration
+and plugin lifecycle — they are not a user-facing API schema but document the
+framework's public surface for tooling, introspection, and documentation purposes.
+"""
+
+# ---------------------------------------------------------------------------
+# Scalars
+# ---------------------------------------------------------------------------
+
+"""
+Represents a browser File object received via the GraphQL multipart request spec.
+Maps to the Web API File interface (name, type, size, lastModified, arrayBuffer, stream, text).
+Used together with the Upload scalar in file-upload mutations.
+See: https://github.com/jaydenseric/graphql-multipart-request-spec
+"""
+scalar File
+
+"""
+Upload scalar — a Promise that resolves to a File object.
+Declared on the server side; clients send files as multipart form data.
+Usage: argument type Upload in a mutation field triggers multipart handling.
+"""
+scalar Upload
+
+"""
+Any JSON-serialisable value (object, array, scalar).
+Used for GraphQL variables, extensions, and execution results.
+"""
+scalar JSON
+
+# ---------------------------------------------------------------------------
+# GraphQL request parameters (YogaInitialContext.params / GraphQLParams)
+# ---------------------------------------------------------------------------
+
+"""
+The parsed parameters of an incoming GraphQL HTTP request.
+Corresponds to the GraphQLParams interface in packages/graphql-yoga/src/types.ts.
+"""
+type GraphQLParams {
+  "The GraphQL operation document string."
+  query: String
+
+  "The name of the operation to execute when the document contains multiple operations."
+  operationName: String
+
+  "A JSON object of variable values keyed by variable name."
+  variables: JSON
+
+  "A JSON object of protocol extensions (e.g. persistedQuery, defer/stream hints)."
+  extensions: JSON
+}
+
+# ---------------------------------------------------------------------------
+# CORS options (YogaServerOptions.cors → CORSOptions)
+# ---------------------------------------------------------------------------
+
+"""
+Cross-Origin Resource Sharing configuration.
+Pass false to disable CORS handling entirely (handle it yourself or via a proxy).
+Source: CORSOptions in packages/graphql-yoga/src/types.ts
+"""
+type CORSOptions {
+  "Allowed origins. Defaults to the request Origin header (echo-back)."
+  origin: [String!]
+
+  "Allowed HTTP methods."
+  methods: [String!]
+
+  "Headers the server allows the browser to send."
+  allowedHeaders: [String!]
+
+  "Headers the browser may expose to JavaScript."
+  exposedHeaders: [String!]
+
+  "Whether to allow credentials (cookies, auth headers)."
+  credentials: Boolean
+
+  "Preflight cache lifetime in seconds (Access-Control-Max-Age)."
+  maxAge: Int
+}
+
+# ---------------------------------------------------------------------------
+# Batching options (YogaServerOptions.batching → BatchingOptions)
+# ---------------------------------------------------------------------------
+
+"""
+Configuration for GraphQL request batching (RFC: graphql-over-http Batching).
+Set to true to enable with defaults, or provide a limit.
+Source: BatchingOptions in packages/graphql-yoga/src/server.ts
+"""
+type BatchingOptions {
+  "Maximum number of operations allowed in a single batched request. Default: 10."
+  limit: Int
+}
+
+# ---------------------------------------------------------------------------
+# Parser / validation cache options
+# ---------------------------------------------------------------------------
+
+"""
+Options for the built-in LRU parser and validation cache.
+Source: ParserAndValidationCacheOptions in packages/graphql-yoga/src/plugins/use-parser-and-validation-cache.ts
+"""
+type ParserAndValidationCacheOptions {
+  "Maximum number of documents to keep in the parse cache."
+  documentCacheSize: Int
+
+  "Maximum number of validated documents to keep in the validation cache."
+  validationCacheSize: Int
+}
+
+# ---------------------------------------------------------------------------
+# Masked error options (YogaServerOptions.maskedErrors)
+# ---------------------------------------------------------------------------
+
+"""
+Controls error masking — prevents unexpected server errors leaking to clients.
+Recommended to enable in production. GraphQLError / EnvelopError are forwarded as-is.
+Source: YogaMaskedErrorOpts in packages/graphql-yoga/src/types.ts
+"""
+type MaskedErrorOptions {
+  "The message sent to clients when an unexpected error occurs. Default: 'Unexpected error.'"
+  errorMessage: String
+
+  "When true, original error messages are included (useful in development)."
+  isDev: Boolean
+}
+
+# ---------------------------------------------------------------------------
+# HTTP error extensions (GraphQLHTTPExtensions / GraphQLHTTPErrorExtensions)
+# ---------------------------------------------------------------------------
+
+"""
+HTTP-level metadata that can be attached to a GraphQLError via error.extensions.http.
+Allows resolvers to control HTTP status codes and response headers.
+Source: GraphQLHTTPExtensions in packages/graphql-yoga/src/types.ts
+"""
+type GraphQLHTTPExtensions {
+  "When true, the error conforms to the GraphQL-over-HTTP spec error format."
+  spec: Boolean
+
+  "HTTP status code to return for this error (e.g. 401, 403, 404)."
+  status: Int
+
+  "Additional HTTP response headers to include when this error is returned."
+  headers: JSON
+}
+
+# ---------------------------------------------------------------------------
+# Server configuration summary (YogaServerOptions)
+# ---------------------------------------------------------------------------
+
+"""
+Top-level configuration accepted by createYoga(). Mirrors YogaServerOptions<TServerContext, TUserContext>.
+Source: packages/graphql-yoga/src/server.ts
+"""
+type YogaServerOptions {
+  "GraphQL endpoint path. Default: /graphql"
+  graphqlEndpoint: String
+
+  "Health / liveness check endpoint path. Default: /health"
+  healthCheckEndpoint: String
+
+  "Enable GraphiQL IDE. Pass false to disable, or an options object to customise."
+  graphiql: Boolean
+
+  "Show a landing page for non-GraphQL requests. Pass false to disable."
+  landingPage: Boolean
+
+  "Mask unexpected errors in production. Recommended: true. Default: true."
+  maskedErrors: MaskedErrorOptions
+
+  "CORS configuration. Pass false to disable."
+  cors: CORSOptions
+
+  "Enable GraphQL multipart request spec (file uploads). Default: true."
+  multipart: Boolean
+
+  "Enable parser and validation result caching for performance."
+  parserAndValidationCache: ParserAndValidationCacheOptions
+
+  "Enable request batching. Default: false."
+  batching: BatchingOptions
+
+  "Extra parameter names allowed in POST body beyond the standard four."
+  extraParamNames: [String!]
+}
+
+# ---------------------------------------------------------------------------
+# Plugin lifecycle hooks (packages/graphql-yoga/src/plugins/types.ts)
+# ---------------------------------------------------------------------------
+
+"""
+Summary of the plugin hook interface available to Envelop/Yoga plugins.
+Yoga plugins extend the EnvelopPlugin interface and add Yoga-specific lifecycle hooks.
+Source: Plugin<PluginContext, TServerContext, TUserContext> in packages/graphql-yoga/src/plugins/types.ts
+
+Hook execution order for a standard request:
+  onYogaInit → onRequest → onRequestParse → onRequestParseDone
+  → onParams → onContextBuilding → onParse → onValidate
+  → onExecute / onSubscribe → onExecutionResult → onResultProcess → onResponse
+"""
+type PluginHooks {
+  """
+  Fired once when the Yoga server is initialised — before it starts handling requests.
+  Useful for setting up long-running resources (caches, monitoring clients).
+  Payload: { yoga: YogaServerInstance }
+  """
+  onYogaInit: String
+
+  """
+  Fired for every incoming HTTP request before GraphQL parameter parsing.
+  Allows request inspection, auth checks, or swapping the request parser.
+  Payload: { request, url, requestParser, serverContext, setRequestParser, fetchAPI, endResponse }
+  """
+  onRequestParse: String
+
+  """
+  Fired after GraphQL parameters have been parsed from the HTTP request.
+  Allows mutation of parsed params or short-circuiting execution.
+  Payload: { requestParserResult, setRequestParserResult }
+  """
+  onRequestParseDone: String
+
+  """
+  Fired after params are available but before execution.
+  Can replace params, swap the params handler, or inject a result directly.
+  Payload: { request, params, setParams, paramsHandler, setParamsHandler, setResult, fetchAPI, context }
+  """
+  onParams: String
+
+  """
+  Fired before the graphql-js execute() function is called.
+  Inherits from Envelop's onExecute hook — allows schema swapping, arg mutation, result interception.
+  Payload: EnvelopOnExecuteEventPayload (args, setSchema, extendContext, setResultAndStopExecution, …)
+  """
+  onExecute: String
+
+  """
+  Fired before the graphql-js subscribe() function is called.
+  Inherits from Envelop's onSubscribe hook.
+  Payload: EnvelopOnSubscribeEventPayload
+  """
+  onSubscribe: String
+
+  """
+  Fired for each execution result (including every event in a subscription stream).
+  Batched requests invoke this hook once per operation.
+  Payload: { request, result, setResult, context }
+  """
+  onExecutionResult: String
+
+  """
+  Fired after execution, before the result is serialised and sent.
+  Allows choosing a custom result processor (JSON, SSE, multipart).
+  Payload: { request, result, setResult, resultProcessor, acceptableMediaTypes, setResultProcessor, serverContext }
+  """
+  onResultProcess: String
+}
+
+# ---------------------------------------------------------------------------
+# Persisted operations plugin (packages/plugins/persisted-operations)
+# ---------------------------------------------------------------------------
+
+"""
+Configuration for the usePersistedOperations() plugin.
+Persisted operations replace the full query string with a short hash or ID,
+reducing bandwidth and enabling server-side allow-listing of approved queries.
+Source: UsePersistedOperationsOptions in packages/plugins/persisted-operations/src/index.ts
+
+Standard APQ (Automatic Persisted Queries) extension sent by clients:
+  extensions: { persistedQuery: { version: 1, sha256Hash: "<hex>" } }
+"""
+type PersistedOperationsOptions {
+  """
+  Whether to allow arbitrary (non-persisted) operations in addition to persisted ones.
+  Can be a boolean or a function (request) => boolean for per-request control.
+  Default: false (deny-all — only persisted operations are executed).
+  """
+  allowArbitraryOperations: Boolean
+
+  "Skip validation of the persisted document (improves performance when docs are pre-validated)."
+  skipDocumentValidation: Boolean
+}
+
+# ---------------------------------------------------------------------------
+# Server-sent events subscription wire format
+# ---------------------------------------------------------------------------
+
+"""
+Server-Sent Events (SSE) wire format used by GraphQL Yoga subscriptions.
+Content-Type: text/event-stream; Connection: keep-alive; Cache-Control: no-cache
+
+SSE stream lifecycle:
+  1. Connection opens → server sends a keep-alive ping comment (:)
+  2. For each subscription event → "event: next\ndata: <JSON ExecutionResult>\n\n"
+  3. When the subscription completes → "event: complete\ndata:\n\n"
+  4. Keep-alive pings are sent every 12 seconds to prevent proxy timeouts.
+
+Clients connect via GET or POST to the graphqlEndpoint with
+  Accept: text/event-stream
+and GraphQL params in the query string (GET) or request body (POST).
+Source: packages/graphql-yoga/src/plugins/result-processor/sse.ts
+"""
+type SSESubscriptionEvent {
+  "SSE event name — always 'next' for data events."
+  event: String!
+
+  "Serialised ExecutionResult JSON: { data?, errors?, extensions? }"
+  data: String!
+}
+
+# ---------------------------------------------------------------------------
+# Example minimal schema (illustrative — not part of the framework itself)
+# ---------------------------------------------------------------------------
+
+"""
+Example root types showing the pattern for a GraphQL Yoga application schema.
+In a real Yoga deployment, the user supplies their own typeDefs + resolvers
+to createSchema() / createYoga(). Yoga itself does not impose any particular
+Query, Mutation, or Subscription shape.
+"""
+type Query {
+  "Health probe — returns true when the server is ready."
+  ping: Boolean!
+}
+
+type Mutation {
+  "Example file-upload mutation using the Upload scalar."
+  uploadFile(file: Upload!): FileUploadResult
+}
+
+type Subscription {
+  "Example subscription delivered via SSE (text/event-stream)."
+  countdown(from: Int!): Int!
+}
+
+type FileUploadResult {
+  "Filename as reported by the client."
+  filename: String!
+
+  "MIME type of the uploaded file."
+  mimetype: String!
+
+  "Byte size of the uploaded file."
+  size: Int!
+}

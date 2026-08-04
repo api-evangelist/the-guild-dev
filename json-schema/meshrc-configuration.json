@@ -1,0 +1,293 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/api-evangelist/graphql-mesh/json-schema/meshrc-configuration.json",
+  "title": "GraphQL Mesh Configuration",
+  "description": "JSON Schema for the .meshrc.yml configuration file that defines a GraphQL Mesh gateway.",
+  "type": "object",
+  "required": ["sources"],
+  "properties": {
+    "sources": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Source"
+      },
+      "description": "List of data sources to mesh together."
+    },
+    "transforms": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Transform"
+      },
+      "description": "Transformations to apply to the unified schema."
+    },
+    "additionalTypeDefs": {
+      "type": "string",
+      "description": "Additional SDL type definitions to add."
+    },
+    "additionalResolvers": {
+      "oneOf": [
+        { "type": "string" },
+        {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "targetTypeName": { "type": "string" },
+              "targetFieldName": { "type": "string" },
+              "sourceName": { "type": "string" },
+              "sourceTypeName": { "type": "string" },
+              "sourceFieldName": { "type": "string" },
+              "requiredSelectionSet": { "type": "string" },
+              "sourceArgs": { "type": "object" }
+            }
+          }
+        }
+      ],
+      "description": "Additional resolvers for cross-source type merging."
+    },
+    "serve": {
+      "type": "object",
+      "properties": {
+        "hostname": {
+          "type": "string",
+          "default": "0.0.0.0",
+          "description": "Server hostname."
+        },
+        "port": {
+          "type": "integer",
+          "default": 4000,
+          "description": "Server port."
+        },
+        "cors": {
+          "type": "object",
+          "properties": {
+            "origin": {
+              "oneOf": [
+                { "type": "string" },
+                { "type": "array", "items": { "type": "string" } }
+              ]
+            },
+            "credentials": { "type": "boolean" },
+            "allowedHeaders": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "methods": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          }
+        },
+        "endpoint": {
+          "type": "string",
+          "default": "/graphql",
+          "description": "GraphQL endpoint path."
+        },
+        "playground": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable GraphQL Playground."
+        },
+        "browser": {
+          "oneOf": [
+            { "type": "boolean" },
+            { "type": "string" }
+          ],
+          "description": "Open browser on start."
+        }
+      }
+    },
+    "cache": {
+      "type": "object",
+      "properties": {
+        "redis": {
+          "type": "object",
+          "properties": {
+            "host": { "type": "string" },
+            "port": { "type": "integer" },
+            "password": { "type": "string" }
+          }
+        },
+        "file": {
+          "type": "object",
+          "properties": {
+            "path": { "type": "string" }
+          }
+        }
+      },
+      "description": "Cache configuration."
+    },
+    "documents": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Glob patterns for GraphQL documents."
+    },
+    "sdk": {
+      "type": "object",
+      "properties": {
+        "generateOperations": {
+          "type": "object",
+          "properties": {
+            "selectionSetDepth": { "type": "integer" }
+          }
+        }
+      },
+      "description": "SDK generation configuration."
+    }
+  },
+  "$defs": {
+    "Source": {
+      "type": "object",
+      "required": ["name", "handler"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Unique name for this data source."
+        },
+        "handler": {
+          "type": "object",
+          "properties": {
+            "openapi": {
+              "type": "object",
+              "properties": {
+                "source": { "type": "string", "description": "URL or path to OpenAPI spec." },
+                "baseUrl": { "type": "string" },
+                "operationHeaders": { "type": "object", "additionalProperties": { "type": "string" } }
+              }
+            },
+            "graphql": {
+              "type": "object",
+              "properties": {
+                "endpoint": { "type": "string" },
+                "operationHeaders": { "type": "object", "additionalProperties": { "type": "string" } },
+                "useGETForQueries": { "type": "boolean" }
+              }
+            },
+            "grpc": {
+              "type": "object",
+              "properties": {
+                "endpoint": { "type": "string" },
+                "protoFilePath": { "type": "string" }
+              }
+            },
+            "jsonSchema": {
+              "type": "object",
+              "properties": {
+                "baseUrl": { "type": "string" },
+                "operations": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "type": { "type": "string", "enum": ["Query", "Mutation"] },
+                      "field": { "type": "string" },
+                      "path": { "type": "string" },
+                      "method": { "type": "string" },
+                      "requestSchema": { "type": "string" },
+                      "responseSchema": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            },
+            "soap": {
+              "type": "object",
+              "properties": {
+                "wsdl": { "type": "string" }
+              }
+            },
+            "postgraphile": {
+              "type": "object",
+              "properties": {
+                "connectionString": { "type": "string" }
+              }
+            },
+            "mysql": {
+              "type": "object",
+              "properties": {
+                "host": { "type": "string" },
+                "port": { "type": "integer" },
+                "user": { "type": "string" },
+                "password": { "type": "string" },
+                "database": { "type": "string" }
+              }
+            }
+          },
+          "description": "Handler configuration (one handler type per source)."
+        },
+        "transforms": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Transform"
+          },
+          "description": "Source-level transformations."
+        }
+      }
+    },
+    "Transform": {
+      "type": "object",
+      "properties": {
+        "rename": {
+          "type": "object",
+          "properties": {
+            "renames": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "from": {
+                    "type": "object",
+                    "properties": {
+                      "type": { "type": "string" },
+                      "field": { "type": "string" }
+                    }
+                  },
+                  "to": {
+                    "type": "object",
+                    "properties": {
+                      "type": { "type": "string" },
+                      "field": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "prefix": {
+          "type": "object",
+          "properties": {
+            "value": { "type": "string" },
+            "includeRootOperations": { "type": "boolean" }
+          }
+        },
+        "filterSchema": {
+          "type": "object",
+          "properties": {
+            "filters": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          }
+        },
+        "cache": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "field": { "type": "string" },
+              "cacheKey": { "type": "string" },
+              "invalidate": {
+                "type": "object",
+                "properties": {
+                  "ttl": { "type": "integer" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "description": "Schema transformation."
+    }
+  }
+}

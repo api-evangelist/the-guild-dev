@@ -1,0 +1,417 @@
+"""
+GraphQL Inspector Core Vocabulary Schema
+Source: @graphql-inspector/core (https://github.com/graphql-hive/graphql-inspector)
+
+GraphQL Inspector is a CLI and GitHub Action for schema change detection and
+validation. It does not expose a public GraphQL API endpoint. This SDL describes
+the programmatic type vocabulary of the @graphql-inspector/core package, which
+models schema diffs, coverage reports, similar-type detection, and document
+validation results.
+
+All types and enum values are derived from confirmed source code at:
+packages/core/src/diff/changes/change.ts
+packages/core/src/coverage/index.ts
+packages/core/src/similar/index.ts
+packages/core/src/validate/index.ts
+"""
+
+# ─── Criticality ────────────────────────────────────────────────────────────
+
+"""
+Severity level of a detected schema change.
+"""
+enum CriticalityLevel {
+  """
+  A change that will break existing GraphQL clients.
+  Examples: removing a type, removing a field, changing a field type to an incompatible type.
+  """
+  BREAKING
+
+  """
+  A change that may break some clients depending on their usage.
+  Examples: adding a new required argument, changing a union membership.
+  """
+  DANGEROUS
+
+  """
+  A change that is safe for existing clients.
+  Examples: adding a new field, adding an optional argument.
+  """
+  NON_BREAKING
+}
+
+"""
+Criticality metadata attached to every detected schema change.
+"""
+type Criticality {
+  """
+  The severity level of this change.
+  """
+  level: CriticalityLevel!
+
+  """
+  Optional human-readable explanation of why this criticality level was assigned.
+  """
+  reason: String
+
+  """
+  True when the criticality was downgraded to safe because the considerUsage
+  rule determined the changed field/type is not in active use.
+  """
+  isSafeBasedOnUsage: Boolean
+}
+
+# ─── Change Types ────────────────────────────────────────────────────────────
+
+"""
+Enumeration of every schema change type that GraphQL Inspector can detect.
+Sourced from ChangeType constant in packages/core/src/diff/changes/change.ts.
+"""
+enum ChangeType {
+  # Argument changes
+  FIELD_ARGUMENT_DESCRIPTION_CHANGED
+  FIELD_ARGUMENT_DEFAULT_CHANGED
+  FIELD_ARGUMENT_TYPE_CHANGED
+
+  # Directive definition changes
+  DIRECTIVE_REMOVED
+  DIRECTIVE_ADDED
+  DIRECTIVE_DESCRIPTION_CHANGED
+  DIRECTIVE_LOCATION_ADDED
+  DIRECTIVE_LOCATION_REMOVED
+  DIRECTIVE_ARGUMENT_ADDED
+  DIRECTIVE_ARGUMENT_REMOVED
+  DIRECTIVE_ARGUMENT_DESCRIPTION_CHANGED
+  DIRECTIVE_ARGUMENT_DEFAULT_VALUE_CHANGED
+  DIRECTIVE_ARGUMENT_TYPE_CHANGED
+  DIRECTIVE_REPEATABLE_ADDED
+  DIRECTIVE_REPEATABLE_REMOVED
+
+  # Enum changes
+  ENUM_VALUE_REMOVED
+  ENUM_VALUE_ADDED
+  ENUM_VALUE_DESCRIPTION_CHANGED
+  ENUM_VALUE_DEPRECATION_REASON_CHANGED
+  ENUM_VALUE_DEPRECATION_REASON_ADDED
+  ENUM_VALUE_DEPRECATION_REASON_REMOVED
+
+  # Field changes
+  FIELD_REMOVED
+  FIELD_ADDED
+  FIELD_DESCRIPTION_CHANGED
+  FIELD_DESCRIPTION_ADDED
+  FIELD_DESCRIPTION_REMOVED
+  FIELD_DEPRECATION_ADDED
+  FIELD_DEPRECATION_REMOVED
+  FIELD_DEPRECATION_REASON_CHANGED
+  FIELD_DEPRECATION_REASON_ADDED
+  FIELD_DEPRECATION_REASON_REMOVED
+  FIELD_TYPE_CHANGED
+  FIELD_ARGUMENT_ADDED
+  FIELD_ARGUMENT_REMOVED
+
+  # Input type changes
+  INPUT_FIELD_REMOVED
+  INPUT_FIELD_ADDED
+  INPUT_FIELD_DESCRIPTION_ADDED
+  INPUT_FIELD_DESCRIPTION_REMOVED
+  INPUT_FIELD_DESCRIPTION_CHANGED
+  INPUT_FIELD_DEFAULT_VALUE_CHANGED
+  INPUT_FIELD_TYPE_CHANGED
+
+  # Object type changes
+  OBJECT_TYPE_INTERFACE_ADDED
+  OBJECT_TYPE_INTERFACE_REMOVED
+
+  # Schema root type changes
+  SCHEMA_QUERY_TYPE_CHANGED
+  SCHEMA_MUTATION_TYPE_CHANGED
+  SCHEMA_SUBSCRIPTION_TYPE_CHANGED
+
+  # Named type changes
+  TYPE_REMOVED
+  TYPE_ADDED
+  TYPE_KIND_CHANGED
+  TYPE_DESCRIPTION_CHANGED
+  TYPE_DESCRIPTION_REMOVED
+  TYPE_DESCRIPTION_ADDED
+
+  # Union changes
+  UNION_MEMBER_REMOVED
+  UNION_MEMBER_ADDED
+
+  # Directive usage changes on schema elements
+  DIRECTIVE_USAGE_UNION_MEMBER_ADDED
+  DIRECTIVE_USAGE_UNION_MEMBER_REMOVED
+  DIRECTIVE_USAGE_ENUM_ADDED
+  DIRECTIVE_USAGE_ENUM_REMOVED
+  DIRECTIVE_USAGE_ENUM_VALUE_ADDED
+  DIRECTIVE_USAGE_ENUM_VALUE_REMOVED
+  DIRECTIVE_USAGE_INPUT_OBJECT_ADDED
+  DIRECTIVE_USAGE_INPUT_OBJECT_REMOVED
+  DIRECTIVE_USAGE_FIELD_ADDED
+  DIRECTIVE_USAGE_FIELD_REMOVED
+  DIRECTIVE_USAGE_SCALAR_ADDED
+  DIRECTIVE_USAGE_SCALAR_REMOVED
+  DIRECTIVE_USAGE_OBJECT_ADDED
+  DIRECTIVE_USAGE_OBJECT_REMOVED
+  DIRECTIVE_USAGE_INTERFACE_ADDED
+  DIRECTIVE_USAGE_INTERFACE_REMOVED
+  DIRECTIVE_USAGE_ARGUMENT_DEFINITION_ADDED
+  DIRECTIVE_USAGE_ARGUMENT_DEFINITION_REMOVED
+  DIRECTIVE_USAGE_SCHEMA_ADDED
+  DIRECTIVE_USAGE_SCHEMA_REMOVED
+  DIRECTIVE_USAGE_FIELD_DEFINITION_ADDED
+  DIRECTIVE_USAGE_FIELD_DEFINITION_REMOVED
+  DIRECTIVE_USAGE_INPUT_FIELD_DEFINITION_ADDED
+  DIRECTIVE_USAGE_INPUT_FIELD_DEFINITION_REMOVED
+  DIRECTIVE_USAGE_ARGUMENT_ADDED
+  DIRECTIVE_USAGE_ARGUMENT_REMOVED
+}
+
+# ─── Change ──────────────────────────────────────────────────────────────────
+
+"""
+A single detected difference between two GraphQL schema versions.
+Returned by the diff() function in @graphql-inspector/core.
+"""
+type Change {
+  """
+  Human-readable description of the change.
+  """
+  message: String!
+
+  """
+  Dot-separated path to the changed element in the schema (e.g. "Query.user.id").
+  May be absent for schema-root changes.
+  """
+  path: String
+
+  """
+  The category of change, identifying which schema element was affected.
+  """
+  type: ChangeType!
+
+  """
+  The criticality of this change (BREAKING, DANGEROUS, or NON_BREAKING).
+  """
+  criticality: Criticality!
+}
+
+# ─── Coverage ────────────────────────────────────────────────────────────────
+
+"""
+Source location span within a GraphQL document (character offsets).
+"""
+type Location {
+  start: Int!
+  end: Int!
+}
+
+"""
+Coverage data for a single argument on a field.
+"""
+type ArgumentCoverage {
+  """Number of times this argument was used across all provided operations."""
+  hits: Int!
+  fieldsCount: Int!
+  fieldsCountCovered: Int!
+}
+
+"""
+Coverage data for a single field on a type, including its arguments.
+"""
+type TypeChildCoverage {
+  """Number of times this field was selected across all provided operations."""
+  hits: Int!
+  fieldsCount: Int!
+  fieldsCountCovered: Int!
+}
+
+"""
+Aggregate coverage data for a single named type.
+"""
+type TypeCoverage {
+  """Number of times any field on this type was selected."""
+  hits: Int!
+  """Total number of fields defined on this type."""
+  fieldsCount: Int!
+  """Number of fields that appeared at least once in the provided operations."""
+  fieldsCountCovered: Int!
+}
+
+"""
+Top-level coverage statistics across the whole schema.
+"""
+type CoverageStats {
+  numTypes: Int!
+  numTypesCoveredFully: Int!
+  numTypesCovered: Int!
+  numFields: Int!
+  numQueries: Int!
+  numCoveredQueries: Int!
+  numMutations: Int!
+  numCoveredMutations: Int!
+  numSubscriptions: Int!
+  numCoveredSubscriptions: Int!
+  numFieldsCovered: Int!
+}
+
+"""
+Full schema coverage report produced by the coverage() function.
+"""
+type SchemaCoverage {
+  """
+  Aggregate numeric statistics for the coverage run.
+  """
+  stats: CoverageStats!
+}
+
+# ─── Similar Types ───────────────────────────────────────────────────────────
+
+"""
+A single candidate type match with its similarity rating (0.0 – 1.0).
+"""
+type Rating {
+  """The name of the candidate type."""
+  target: String!
+  """Dice-coefficient similarity score. Values above the threshold (default 0.4) are reported."""
+  rating: Float!
+}
+
+"""
+The best structural match for a given type, plus other candidates above threshold.
+"""
+type BestMatch {
+  """The highest-rated matching type."""
+  bestMatch: Rating!
+  """Other types that also exceeded the similarity threshold, sorted by rating descending."""
+  ratings: [Rating!]!
+}
+
+# ─── Validation ──────────────────────────────────────────────────────────────
+
+"""
+A GraphQL operation document that failed schema validation.
+"""
+type InvalidDocument {
+  """
+  The source name (usually a file path) of the invalid document.
+  """
+  sourceName: String!
+  """
+  One or more validation errors found in the document.
+  """
+  errors: [String!]!
+}
+
+# ─── GitHub Actions Input/Output ─────────────────────────────────────────────
+
+"""
+Represents the inputs accepted by the graphql-inspector GitHub Action (action.yml).
+This is a conceptual type — Actions inputs are YAML strings, not a live GraphQL type.
+"""
+type GitHubActionInputs {
+  """
+  Required. Ref and path to the schema (e.g. "main:schema.graphql") or URL to
+  the "after" GraphQL API endpoint.
+  """
+  schema: String!
+
+  """
+  URL of the live "before" GraphQL API endpoint.
+  """
+  endpoint: String
+
+  """
+  Label for the GitHub check run. Default: "GraphQL Inspector".
+  Useful when running multiple Inspector checks in one workflow.
+  """
+  name: String
+
+  """
+  Whether to post inline PR annotations. Default: true.
+  """
+  annotations: Boolean
+
+  """
+  Whether to fail the workflow on any breaking change. Default: true.
+  """
+  failOnBreaking: Boolean
+
+  """
+  PR label that marks breaking changes as intentional and suppresses failure.
+  Default: "approved-breaking-change".
+  """
+  approveLabel: String
+
+  """
+  GitHub token used to post check runs and read PR metadata.
+  Default: the workflow's automatic GITHUB_TOKEN.
+  """
+  githubToken: String
+
+  """
+  When true, merges the PR branch with the target branch before schema
+  comparison to ensure the comparison reflects the merged state. Default: true.
+  """
+  experimentalMerge: Boolean
+
+  """
+  Built-in rule names to apply, one per line.
+  Available: dangerousBreaking, suppressRemovalOfDeprecatedField,
+  ignoreDescriptionChanges, safeUnreachable, considerUsage.
+  """
+  rules: String
+
+  """
+  Path to a JS module exporting a considerUsage callback, used only when the
+  considerUsage rule is enabled.
+  """
+  onUsage: String
+}
+
+"""
+Outputs emitted by the graphql-inspector GitHub Action after a run.
+"""
+type GitHubActionOutputs {
+  """
+  Total number of schema changes detected (breaking + dangerous + non-breaking).
+  """
+  changes: Int!
+}
+
+# ─── Built-in Rules ──────────────────────────────────────────────────────────
+
+"""
+Names of the built-in diff rules shipped with @graphql-inspector/core.
+"""
+enum DiffRule {
+  """
+  Promotes all DANGEROUS changes to BREAKING status.
+  """
+  dangerousBreaking
+
+  """
+  Reclassifies the removal of a @deprecated field from BREAKING to DANGEROUS.
+  """
+  suppressRemovalOfDeprecatedField
+
+  """
+  Removes description-only changes from the result set.
+  """
+  ignoreDescriptionChanges
+
+  """
+  Marks BREAKING changes in schema areas that are unreachable from the root
+  types as safe (NON_BREAKING).
+  """
+  safeUnreachable
+
+  """
+  Delegates the breaking/safe decision to a user-supplied usage callback.
+  The callback receives field/type usage data and returns a boolean.
+  Requires the onUsage input to point to a JS module.
+  """
+  considerUsage
+}

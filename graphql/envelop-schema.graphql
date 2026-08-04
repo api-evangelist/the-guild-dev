@@ -1,0 +1,646 @@
+# Envelop Plugin API — GraphQL SDL
+#
+# Source: @envelop/types@5.2.1 and @envelop/core@5.5.1 (npm packages)
+# Files:  typings/plugin.d.ts, typings/hooks.d.ts, typings/get-enveloped.d.ts,
+#         typings/context-types.d.ts, typings/graphql.d.ts,
+#         typings/plugins/use-*.d.ts, typings/create.d.ts
+#
+# Envelop is a TypeScript library — not a hosted GraphQL service.
+# This SDL models the plugin API surface for documentation and tooling purposes.
+# Generics and union types are represented as their most concrete SDL equivalents.
+
+# ---------------------------------------------------------------------------
+# Scalars
+# ---------------------------------------------------------------------------
+
+"""Any JSON-serialisable value (maps to TypeScript `unknown`)."""
+scalar JSON
+
+"""A serialisable object (maps to `Record<string, unknown>`)."""
+scalar JSONObject
+
+# ---------------------------------------------------------------------------
+# Enumerations
+# ---------------------------------------------------------------------------
+
+"""The GraphQL execution phase in which an error occurred."""
+enum ErrorPhase {
+  parse
+  validate
+  context
+  execution
+}
+
+# ---------------------------------------------------------------------------
+# Core result types (from graphql.d.ts / @envelop/types)
+# ---------------------------------------------------------------------------
+
+"""
+Standard GraphQL execution result returned by execute() or subscribe().
+Mirrors graphql-js ExecutionResult<TData, TExtensions>.
+"""
+type ExecutionResult {
+  data: JSONObject
+  errors: [GraphQLErrorLike!]
+  extensions: JSONObject
+}
+
+"""
+Incremental execution result for @defer / @stream responses.
+Mirrors graphql-js IncrementalExecutionResult.
+"""
+type IncrementalExecutionResult {
+  data: JSONObject
+  errors: [GraphQLErrorLike!]
+  extensions: JSONObject
+  hasNext: Boolean!
+  incremental: [IncrementalResult!]
+}
+
+"""A single incremental chunk produced by @defer or @stream."""
+type IncrementalResult {
+  data: JSONObject
+  errors: [GraphQLErrorLike!]
+  extensions: JSONObject
+  items: [JSON]
+  path: [String!]
+  label: String
+}
+
+"""
+Minimal GraphQL error shape that is safe to serialise to JSON.
+Mirrors SerializableGraphQLErrorLike from @envelop/core.
+"""
+type GraphQLErrorLike {
+  message: String!
+  extensions: JSONObject
+}
+
+# ---------------------------------------------------------------------------
+# Execution arguments (TypedExecutionArgs / ExecutionArgs)
+# ---------------------------------------------------------------------------
+
+"""
+Arguments passed to execute() or subscribe().
+Mirrors ExecutionArgs from graphql-js as used in @envelop/types.
+"""
+type ExecutionArgs {
+  """The compiled GraphQL schema."""
+  schema: JSONObject!
+  """The parsed DocumentNode."""
+  document: JSONObject!
+  rootValue: JSON
+  contextValue: JSONObject
+  variableValues: JSONObject
+  operationName: String
+  fieldResolver: JSON
+  typeResolver: JSON
+}
+
+"""Parameters passed to the validate() function."""
+type ValidateFunctionParameter {
+  schema: JSONObject!
+  documentAST: JSONObject!
+  rules: [JSON!]
+  typeInfo: JSON
+  options: JSONObject
+}
+
+# ---------------------------------------------------------------------------
+# GetEnvelopedFn return shape (get-enveloped.d.ts)
+# ---------------------------------------------------------------------------
+
+"""
+Object returned by a getEnveloped() call (one per request).
+Mirrors the anonymous return type of GetEnvelopedFn<PluginsContext>.
+"""
+type EnvelopedRequest {
+  """Parsed DocumentNode produced by the configured parse function."""
+  schema: JSONObject
+  """Call to execute a parsed, validated document."""
+  execute: JSON
+  """Call to validate a parsed document against the schema."""
+  validate: JSON
+  """Call to parse a GraphQL source string into a DocumentNode."""
+  parse: JSON
+  """
+  Async factory that merges initial context, plugin context extensions,
+  and a per-call context extension into the final context object.
+  """
+  contextFactory: JSON
+  """Call to set up a subscription."""
+  subscribe: JSON
+}
+
+# ---------------------------------------------------------------------------
+# Plugin interface (plugin.d.ts)
+# ---------------------------------------------------------------------------
+
+"""
+The Plugin interface implemented by every Envelop plugin.
+All hook fields are optional; a plugin implements only the hooks it needs.
+Mirrors Plugin<PluginContext> from @envelop/types.
+"""
+type Plugin {
+  """
+  Invoked once when the plugin is registered (onPluginInit phase).
+  Provides addPlugin, plugins list, setSchema, and registerContextErrorHandler.
+  """
+  onPluginInit: OnPluginInitEventPayload
+
+  """
+  Invoked for each getEnveloped() call before any phase begins.
+  Provides setSchema, context, and extendContext.
+  """
+  onEnveloped: OnEnvelopedHookEventPayload
+
+  """
+  Invoked each time a plugin calls setSchema, replacing the active schema.
+  Provides schema and replaceSchema.
+  """
+  onSchemaChange: OnSchemaChangeEventPayload
+
+  """
+  Invoked before (and optionally after) each parse() call.
+  Before payload provides parseFn, setParseFn, setParsedDocument, params, context, extendContext.
+  Return an AfterParseEventPayload hook to intercept the parse result.
+  """
+  onParse: OnParseEventPayload
+
+  """
+  Invoked before (and optionally after) each validate() call.
+  Before payload provides validateFn, setValidationFn, addValidationRule, setResult, params, context, extendContext.
+  Return an AfterValidateEventPayload hook to intercept validation errors.
+  """
+  onValidate: OnValidateEventPayload
+
+  """
+  Invoked before (and optionally after) context is built for a request.
+  Payload provides context, extendContext, and breakContextBuilding.
+  Return an AfterContextBuildingEventPayload hook for post-build access.
+  """
+  onContextBuilding: OnContextBuildingEventPayload
+
+  """
+  Invoked before (and optionally after) each execute() call.
+  Before payload provides executeFn, setExecuteFn, setResultAndStopExecution, args, context, extendContext.
+  Return an OnExecuteHookResult to receive onExecuteDone callbacks.
+  """
+  onExecute: OnExecuteEventPayload
+
+  """
+  Invoked before (and optionally after) each subscribe() call.
+  Before payload provides subscribeFn, setSubscribeFn, setResultAndStopExecution, args, context, extendContext.
+  Return an OnSubscribeHookResult to receive onSubscribeResult / onSubscribeError callbacks.
+  """
+  onSubscribe: OnSubscribeEventPayload
+
+  """Optional instrumentation wrappers for each execution phase."""
+  instrumentation: Instrumentation
+}
+
+# ---------------------------------------------------------------------------
+# onPluginInit hook (hooks.d.ts — OnPluginInitEventPayload)
+# ---------------------------------------------------------------------------
+
+"""Payload delivered to the onPluginInit hook."""
+type OnPluginInitEventPayload {
+  """Register an additional plugin at init time."""
+  addPlugin: JSON
+  """List of all currently registered plugins."""
+  plugins: [Plugin!]!
+  """Set the active GraphQL schema."""
+  setSchema: JSON
+  """Register a handler called when context building throws."""
+  registerContextErrorHandler: JSON
+}
+
+# ---------------------------------------------------------------------------
+# onSchemaChange hook (hooks.d.ts — OnSchemaChangeEventPayload)
+# ---------------------------------------------------------------------------
+
+"""Payload delivered to the onSchemaChange hook."""
+type OnSchemaChangeEventPayload {
+  """The new GraphQL schema that is now active."""
+  schema: JSONObject!
+  """Replace the incoming schema with a different one."""
+  replaceSchema: JSON
+}
+
+# ---------------------------------------------------------------------------
+# onEnveloped hook (hooks.d.ts — OnEnvelopedHookEventPayload)
+# ---------------------------------------------------------------------------
+
+"""Payload delivered to the onEnveloped hook (once per getEnveloped call)."""
+type OnEnvelopedHookEventPayload {
+  """Update the schema used for this request."""
+  setSchema: JSON
+  """Read-only snapshot of the current context."""
+  context: JSONObject
+  """Merge additional fields into the current context."""
+  extendContext: JSON
+}
+
+# ---------------------------------------------------------------------------
+# onParse hooks (hooks.d.ts — OnParseEventPayload / AfterParseEventPayload)
+# ---------------------------------------------------------------------------
+
+"""Payload delivered to the onParse (before-parse) hook."""
+type OnParseEventPayload {
+  """Read-only snapshot of the current context."""
+  context: JSONObject!
+  """Merge additional fields into the current context."""
+  extendContext: JSON
+  """Source string and options that will be passed to parseFn."""
+  params: ParseParams!
+  """The current parse function."""
+  parseFn: JSON
+  """Replace the parse function with a custom implementation."""
+  setParseFn: JSON
+  """
+  Short-circuit parsing by supplying a pre-built DocumentNode.
+  When set, parseFn is not called.
+  """
+  setParsedDocument: JSON
+}
+
+"""Parameters forwarded to the parse function."""
+type ParseParams {
+  source: String!
+  options: JSONObject
+}
+
+"""Payload delivered to the after-parse hook (return value of onParse handler)."""
+type AfterParseEventPayload {
+  """Read-only snapshot of the current context."""
+  context: JSONObject!
+  """Merge additional fields into the current context."""
+  extendContext: JSON
+  """The DocumentNode or Error returned by parse, or null if skipped."""
+  result: JSON
+  """Replace the parse result with a new DocumentNode or Error."""
+  replaceParseResult: JSON
+}
+
+# ---------------------------------------------------------------------------
+# onValidate hooks (hooks.d.ts — OnValidateEventPayload / AfterValidateEventPayload)
+# ---------------------------------------------------------------------------
+
+"""Payload delivered to the onValidate (before-validate) hook."""
+type OnValidateEventPayload {
+  """Read-only snapshot of the current context."""
+  context: JSONObject!
+  """Merge additional fields into the current context."""
+  extendContext: JSON
+  """Schema, document, rules, and options that will be passed to validateFn."""
+  params: ValidateFunctionParameter!
+  """Register an additional validation rule for this invocation."""
+  addValidationRule: JSON
+  """The current validate function."""
+  validateFn: JSON
+  """Replace the validate function with a custom implementation."""
+  setValidationFn: JSON
+  """Supply validation errors directly and skip calling validateFn."""
+  setResult: JSON
+}
+
+"""Payload delivered to the after-validate hook (return value of onValidate handler)."""
+type AfterValidateEventPayload {
+  """Read-only snapshot of the current context."""
+  context: JSONObject!
+  """Merge additional fields into the current context."""
+  extendContext: JSON
+  """True when validation produced no errors."""
+  valid: Boolean!
+  """Array of validation errors; empty when valid is true."""
+  result: [GraphQLErrorLike!]!
+  """Replace the error array with a new one."""
+  setResult: JSON
+}
+
+# ---------------------------------------------------------------------------
+# onContextBuilding hooks (hooks.d.ts — OnContextBuildingEventPayload / AfterContextBuildingEventPayload)
+# ---------------------------------------------------------------------------
+
+"""Payload delivered to the onContextBuilding (before-context) hook."""
+type OnContextBuildingEventPayload {
+  """Read-only snapshot of the current context."""
+  context: JSONObject!
+  """Merge additional fields into the current context."""
+  extendContext: JSON
+  """Stop calling remaining onContextBuilding hooks for this request."""
+  breakContextBuilding: JSON
+}
+
+"""Payload delivered to the after-context-building hook (return value of onContextBuilding handler)."""
+type AfterContextBuildingEventPayload {
+  """The fully built context object for this request."""
+  context: JSONObject!
+  """Merge additional fields into the context after building."""
+  extendContext: JSON
+}
+
+# ---------------------------------------------------------------------------
+# onExecute hooks (hooks.d.ts — OnExecuteEventPayload / OnExecuteHookResult)
+# ---------------------------------------------------------------------------
+
+"""Payload delivered to the onExecute (before-execute) hook."""
+type OnExecuteEventPayload {
+  """The current execute function."""
+  executeFn: JSON
+  """Arguments that will be passed to executeFn."""
+  args: ExecutionArgs!
+  """Replace the execute function with a custom implementation."""
+  setExecuteFn: JSON
+  """Provide an execution result directly and skip calling executeFn."""
+  setResultAndStopExecution: JSON
+  """Read-only snapshot of the context value."""
+  context: JSONObject!
+  """Merge additional fields into the context for this execution."""
+  extendContext: JSON
+}
+
+"""
+Optional object returned from an onExecute handler.
+Provides access to the execute result (including AsyncIterable streams).
+"""
+type OnExecuteHookResult {
+  """Invoked after execute() returns, with the final result or stream."""
+  onExecuteDone: OnExecuteDoneEventPayload
+}
+
+"""Payload delivered to the onExecuteDone hook."""
+type OnExecuteDoneEventPayload {
+  """The execution arguments."""
+  args: ExecutionArgs!
+  """The result returned by executeFn (may be an AsyncIterable for @defer/@stream)."""
+  result: JSON
+  """Replace the execution result."""
+  setResult: JSON
+}
+
+"""
+Optional callbacks returned from an onExecuteDone handler,
+used to intercept individual stream values when execute returns an AsyncIterable.
+"""
+type OnExecuteDoneHookResult {
+  """Called for each value yielded by the AsyncIterable."""
+  onNext: JSON
+  """Called when the AsyncIterable completes."""
+  onEnd: JSON
+}
+
+# ---------------------------------------------------------------------------
+# onSubscribe hooks (hooks.d.ts — OnSubscribeEventPayload / OnSubscribeHookResult)
+# ---------------------------------------------------------------------------
+
+"""Payload delivered to the onSubscribe (before-subscribe) hook."""
+type OnSubscribeEventPayload {
+  """The current subscribe function."""
+  subscribeFn: JSON
+  """Arguments that will be passed to subscribeFn."""
+  args: ExecutionArgs!
+  """Replace the subscribe function with a custom implementation."""
+  setSubscribeFn: JSON
+  """Read-only snapshot of the context value."""
+  context: JSONObject!
+  """Merge additional fields into the context for this subscription."""
+  extendContext: JSON
+  """Provide a subscribe result directly and skip calling subscribeFn."""
+  setResultAndStopExecution: JSON
+}
+
+"""
+Optional object returned from an onSubscribe handler.
+Provides access to the subscribe result stream and error events.
+"""
+type OnSubscribeHookResult {
+  """Invoked with the AsyncIterable returned from subscribe."""
+  onSubscribeResult: OnSubscribeResultEventPayload
+  """Invoked if the subscription source stream throws."""
+  onSubscribeError: SubscribeErrorHookPayload
+}
+
+"""Payload delivered to the onSubscribeResult hook."""
+type OnSubscribeResultEventPayload {
+  """The execution arguments."""
+  args: ExecutionArgs!
+  """The AsyncIterable (or single ExecutionResult) returned by subscribe."""
+  result: JSON
+  """Replace the subscribe result."""
+  setResult: JSON
+}
+
+"""Payload delivered when a subscription source stream throws."""
+type SubscribeErrorHookPayload {
+  """The error that was thrown."""
+  error: JSON
+  """Replace the thrown value with a different error."""
+  setError: JSON
+}
+
+# ---------------------------------------------------------------------------
+# Instrumentation wrapper (plugin.d.ts — Instrumentation<TContext>)
+# ---------------------------------------------------------------------------
+
+"""
+Optional instrumentation wrappers that surround each execution phase,
+including hooks. Each field receives a payload with the current context
+and a `wrapped` function that executes the instrumented code.
+Mirrors Instrumentation<TContext> from @envelop/types.
+"""
+type Instrumentation {
+  """Wraps the envelop initialisation phase."""
+  init: JSON
+  """Wraps the parse phase."""
+  parse: JSON
+  """Wraps the validate phase."""
+  validate: JSON
+  """Wraps the context-building phase."""
+  context: JSON
+  """Wraps the execute phase (may return a Promise)."""
+  execute: JSON
+  """Wraps the subscribe phase (may return a Promise)."""
+  subscribe: JSON
+}
+
+# ---------------------------------------------------------------------------
+# Error handling types (use-masked-errors.d.ts / use-error-handler.d.ts)
+# ---------------------------------------------------------------------------
+
+"""
+Options for the useMaskedErrors built-in plugin.
+Controls how unexpected errors are masked before reaching clients.
+"""
+type UseMaskedErrorsOptions {
+  """
+  Custom function that decides how to mask an error.
+  Defaults to defaultMaskError (returns a generic message in production).
+  """
+  maskError: JSON
+  """
+  Message used for masked errors.
+  Defaults to 'Unexpected error.'
+  """
+  errorMessage: String
+}
+
+"""
+Payload forwarded to the useErrorHandler callback.
+Fired once per error encountered during any execution phase.
+"""
+type ErrorHandlerPayload {
+  """The errors raised during the phase."""
+  errors: [GraphQLErrorLike!]!
+  """Read-only context at the time of the error."""
+  context: JSONObject!
+  """The phase in which the error occurred."""
+  phase: ErrorPhase!
+}
+
+# ---------------------------------------------------------------------------
+# Context error handler (hooks.d.ts — OnContextErrorHandlerPayload)
+# ---------------------------------------------------------------------------
+
+"""
+Payload forwarded to a context error handler registered via registerContextErrorHandler.
+"""
+type OnContextErrorHandlerPayload {
+  """The context object at the last working state before the error."""
+  context: JSONObject!
+  """The error that caused context building to fail."""
+  error: JSON
+  """Replace the error with a different value."""
+  setError: JSON
+}
+
+# ---------------------------------------------------------------------------
+# useEngine options (use-engine.d.ts)
+# ---------------------------------------------------------------------------
+
+"""
+Options accepted by the useEngine built-in plugin.
+Allows swapping out the underlying graphql-js functions used for execution.
+"""
+type UseEngineOptions {
+  """Custom execute function (defaults to graphql-js execute)."""
+  execute: JSON
+  """Custom parse function (defaults to graphql-js parse)."""
+  parse: JSON
+  """Custom validate function (defaults to graphql-js validate)."""
+  validate: JSON
+  """Custom subscribe function (defaults to graphql-js subscribe)."""
+  subscribe: JSON
+  """Override the built-in validation rules."""
+  specifiedRules: [JSON!]
+}
+
+# ---------------------------------------------------------------------------
+# useExtendContext helper type (use-extend-context.d.ts)
+# ---------------------------------------------------------------------------
+
+"""
+Describes the context factory function accepted by useExtendContext.
+The function receives the current context and returns additional fields
+(sync or async) to merge into it.
+"""
+type ContextFactoryFn {
+  """The current context object passed as the sole argument."""
+  currentContext: JSONObject
+  """The partial context fields returned (may be a Promise)."""
+  result: JSONObject
+}
+
+# ---------------------------------------------------------------------------
+# Built-in plugin catalogue
+# (envelop() — create.d.ts + individual use-*.d.ts files)
+# ---------------------------------------------------------------------------
+
+"""
+The @envelop/core package ships these built-in plugins.
+Each is a factory function that returns a Plugin object.
+"""
+type BuiltInPlugins {
+  """
+  useSchema(schema: GraphQLSchema) — Attach a static GraphQL schema.
+  The schema is set once and shared across all requests.
+  """
+  useSchema: Plugin
+
+  """
+  useSchemaByContext(loader: (context) => GraphQLSchema) — Derive the schema
+  dynamically from the request context on each getEnveloped() call.
+  """
+  useSchemaByContext: Plugin
+
+  """
+  useEngine(options: UseEngineOptions) — Replace the underlying
+  graphql-js parse / validate / execute / subscribe functions.
+  """
+  useEngine: Plugin
+
+  """
+  useLogger(options?) — Log execution events.
+  Accepts an optional logFn (defaults to console.log) and skipIntrospection flag.
+  """
+  useLogger: Plugin
+
+  """
+  useExtendContext(factory) — Merge additional fields into the request context.
+  The factory function may be async.
+  """
+  useExtendContext: Plugin
+
+  """
+  useErrorHandler(handler) — Register a callback invoked once per error
+  across the parse, validate, context, and execution phases.
+  """
+  useErrorHandler: Plugin
+
+  """
+  usePayloadFormatter(formatter) — Modify the execution result payload
+  before it is returned to the consumer.
+  """
+  usePayloadFormatter: Plugin
+
+  """
+  useMaskedErrors(options?) — Prevent unexpected error messages from
+  leaking to clients. Passes EnvelopError messages through unchanged.
+  """
+  useMaskedErrors: Plugin
+
+  """
+  useValidationRule(rule) — Register a single additional validation rule
+  applied to every validate() call.
+  """
+  useValidationRule: Plugin
+}
+
+# ---------------------------------------------------------------------------
+# Root query (schema entry-point for tooling)
+# ---------------------------------------------------------------------------
+
+"""
+Root query for the Envelop plugin API schema.
+This schema models a TypeScript library, not a hosted service.
+Use these types to understand the plugin hook surface and built-in plugins.
+"""
+type Query {
+  """Describes the Envelop plugin interface and its lifecycle hooks."""
+  plugin: Plugin
+
+  """Describes the built-in plugins shipped with @envelop/core."""
+  builtInPlugins: BuiltInPlugins
+
+  """
+  Describes the object returned by a getEnveloped() call (one per request).
+  Contains parse, validate, contextFactory, execute, subscribe, and schema.
+  """
+  envelopedRequest: EnvelopedRequest
+
+  """Options for the useMaskedErrors built-in plugin."""
+  maskedErrorsOptions: UseMaskedErrorsOptions
+
+  """Options for the useEngine built-in plugin."""
+  engineOptions: UseEngineOptions
+}

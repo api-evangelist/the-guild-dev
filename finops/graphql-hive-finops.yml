@@ -1,0 +1,101 @@
+specificationVersion: '1.0'
+id: graphql-hive-finops
+name: GraphQL Hive FinOps Framework
+description: >-
+  FinOps guidance for managing GraphQL Hive cloud spend. The primary cost
+  driver is monthly GraphQL operations volume. The platform offers a free
+  Hobby tier for low-volume usage, usage-based Pro pricing, and custom
+  Enterprise agreements with volume discounts.
+url: https://the-guild.dev/graphql/hive/pricing
+framework: FOCUS
+vendor: GraphQL Hive (The Guild)
+currency: USD
+billingModel: usage-based
+costDrivers:
+  - name: OperationsVolume
+    description: >-
+      The primary cost driver. Each GraphQL operation tracked by Hive
+      counts toward the monthly operations quota. Pro plan charges
+      $10 per million operations beyond the 1M base inclusion.
+    unit: operations
+    tier: Pro
+    pricePerUnit: 0.00001
+    pricePerMillion: 10
+    notes: >-
+      An "operation" is a tracked GraphQL request flowing through
+      Hive's usage reporting. Batched reports can combine multiple
+      operations. Self-hosted Hive has no operations cost.
+  - name: BaseSubscription
+    description: >-
+      Pro plan monthly base subscription fee, which includes the first
+      1 million operations per month.
+    unit: month
+    tier: Pro
+    pricePerUnit: 20
+  - name: DataRetention
+    description: >-
+      Data retention window affects historical analytics availability.
+      Hobby provides 7 days, Pro provides 90 days, Enterprise provides
+      a minimum of 1 year. No separate charge for retention — included
+      in plan pricing.
+    unit: days
+    notes: Retention is bundled into plan; not billed separately.
+optimization:
+  - name: UseHobbyForDevelopment
+    description: >-
+      Use the free Hobby plan for all non-production environments.
+      Development, staging, and testing targets do not require a paid plan.
+    impact: cost-reduction
+    effort: low
+  - name: SampleUsageReporting
+    description: >-
+      Configure Hive client SDKs to report a percentage sample of
+      operations rather than 100% to reduce operations count against
+      the monthly quota. Hive's analytics remain statistically
+      representative at 10-20% sampling rates.
+    impact: cost-reduction
+    effort: medium
+  - name: SelfHostForHighVolume
+    description: >-
+      GraphQL Hive is fully open-source (MIT licensed). High-volume
+      organizations can self-host to eliminate per-operation costs,
+      paying only infrastructure costs instead.
+    impact: cost-elimination
+    effort: high
+  - name: MonitorOperationsGrowth
+    description: >-
+      Set up alerts on operations volume to anticipate when Pro plan
+      overage billing will activate. The Hive Console dashboard shows
+      current period operations usage.
+    impact: cost-visibility
+    effort: low
+  - name: EnterpriseVolumeDiscounts
+    description: >-
+      Negotiate Enterprise contracts for predictable high-volume usage.
+      Enterprise tiers offer volume discounts and ensure no data is lost
+      when exceeding limits, unlike the Hobby plan which drops excess data.
+    impact: cost-reduction
+    effort: medium
+budgetGuidance:
+  - scenario: SideProject
+    description: Personal or hobbyist GraphQL API with low traffic
+    recommendedPlan: Hobby
+    estimatedMonthlyCost: 0
+    operationsEstimate: "< 1M/month"
+  - scenario: SmallTeam
+    description: Small production API with moderate traffic
+    recommendedPlan: Pro
+    estimatedMonthlyCost: 20
+    operationsEstimate: "~1M/month"
+  - scenario: GrowingAPI
+    description: Production API with growing usage, 5M ops/month
+    recommendedPlan: Pro
+    estimatedMonthlyCost: 60
+    operationsEstimate: "~5M/month"
+    calculation: "$20 base + 4 x $10 overage = $60/month"
+  - scenario: HighTrafficAPI
+    description: High-traffic API with 50M operations per month
+    recommendedPlan: Enterprise
+    estimatedMonthlyCost: custom
+    operationsEstimate: "50M+/month"
+    notes: "Contact The Guild for volume discount pricing"

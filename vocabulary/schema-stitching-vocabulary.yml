@@ -1,0 +1,135 @@
+aid: schema-stitching
+name: Schema Stitching
+description: >-
+  Vocabulary and taxonomy for GraphQL schema stitching concepts, techniques,
+  tools, and patterns.
+version: '1.0'
+created: '2026-05-02'
+modified: '2026-05-02'
+tags:
+  - GraphQL
+  - API Composition
+  - Schema Stitching
+
+terms:
+  - term: Schema Stitching
+    definition: >-
+      The technique of combining multiple GraphQL schemas into a single unified
+      gateway schema, using schema delegation and type merging to proxy requests
+      to underlying subservices.
+    category: Core Concept
+    aliases:
+      - GraphQL Schema Stitching
+      - Schema Composition
+
+  - term: Subschema
+    definition: >-
+      An individual GraphQL schema that is combined with others via stitching.
+      Subschemas can be local schema instances or remote GraphQL services.
+    category: Core Concept
+    aliases:
+      - Subgraph
+      - Component Schema
+
+  - term: Type Merging
+    definition: >-
+      The process of merging type definitions with the same name from multiple
+      subschemas into a single unified type in the gateway schema. Keys are used
+      to fetch and combine partial type data from different subservices.
+    category: Core Technique
+    aliases:
+      - Schema Merging
+
+  - term: Schema Delegation
+    definition: >-
+      The mechanism by which the gateway schema delegates field resolution to an
+      underlying subschema by forwarding queries to that subschema's executor.
+    category: Core Technique
+
+  - term: Stitching Directives
+    definition: >-
+      SDL directives (@key, @merge, @computed, @canonical) that allow subservices
+      to declare their own merging configuration, enabling gateway-reloadable
+      schema stitching without separate gateway-side config.
+    category: Configuration
+    directives:
+      - "@key": "Marks selection set used to identify an object for merging"
+      - "@merge": "Configures how a type is fetched for merging from this subservice"
+      - "@computed": "Declares computed fields that depend on other services"
+      - "@canonical": "Marks canonical definition of a merged type"
+
+  - term: Schema Extensions
+    definition: >-
+      GraphQL SDL extend keyword usage to add new fields to existing types in
+      the stitched gateway, enabling cross-service field composition.
+    category: Core Technique
+
+  - term: Schema Transform
+    definition: >-
+      A function applied to a subschema before stitching to rename types,
+      filter fields, wrap queries, or otherwise reshape the schema.
+    category: Configuration
+    examples:
+      - FilterRootFields
+      - RenameTypes
+      - WrapQuery
+      - HoistField
+      - PruneSchema
+
+  - term: Gateway Schema
+    definition: >-
+      The unified GraphQL schema produced by stitching multiple subschemas
+      together. Clients query the gateway schema, which proxies requests to
+      the appropriate subservices.
+    category: Architecture
+
+  - term: Query Planning
+    definition: >-
+      The process by which the stitching gateway determines which subschemas
+      to query and in what order to fulfill a gateway query, resolving merged
+      types across service boundaries.
+    category: Architecture
+
+  - term: Batch Execution
+    definition: >-
+      An optimization where the stitching gateway batches multiple requests
+      to a subschema within a single execution cycle, using DataLoader-style
+      batching to reduce network overhead.
+    category: Performance
+
+  - term: Apollo Federation
+    definition: >-
+      An alternative composition approach to schema stitching that uses a
+      supergraph model with @key, @external, @requires, @provides directives
+      managed through a registry and federated router.
+    category: Related Technology
+    comparison: Schema stitching is library-based; Apollo Federation uses a registry model.
+
+  - term: GraphQL Mesh
+    definition: >-
+      A tool from The Guild that applies schema stitching to transform and
+      federate non-GraphQL sources (REST, gRPC, databases) into a unified
+      GraphQL API.
+    category: Related Tool
+
+  - term: Hive Gateway
+    definition: >-
+      A federated GraphQL routing engine from The Guild that supports both
+      Apollo Federation and Schema Stitching for composing distributed services.
+    category: Related Tool
+
+  - term: The Guild
+    definition: >-
+      The open-source organization that maintains graphql-tools, Hive Gateway,
+      GraphQL Mesh, GraphQL Yoga, and the @graphql-tools/stitch package.
+    category: Organization
+
+categories:
+  - Core Concept
+  - Core Technique
+  - Configuration
+  - Architecture
+  - Performance
+  - Related Technology
+  - Related Tool
+  - Organization

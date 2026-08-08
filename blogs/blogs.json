@@ -1,0 +1,35 @@
+{
+  "repo": "the-guild-dev",
+  "feeds": [
+    {
+      "source": "https://linkedin.com/company/the-guild-software",
+      "feed_url": "https://linkedin.com/company/the-guild-software",
+      "title": "",
+      "saved": 0,
+      "method": "none"
+    },
+    {
+      "source": "https://the-guild.dev/blog",
+      "feed_url": "https://the-guild.dev/feed.xml",
+      "title": "",
+      "saved": 0,
+      "method": "discovered"
+    },
+    {
+      "source": "https://graphql-codegen.com/feed",
+      "feed_url": "https://graphql-codegen.com/feed",
+      "title": "",
+      "saved": 0,
+      "method": "feed"
+    },
+    {
+      "source": "https://github.com/graphql-hive",
+      "feed_url": "https://github.com/graphql-hive",
+      "title": "",
+      "saved": 0,
+      "method": "none"
+    }
+  ],
+  "post_count": 0,
+  "fetched": "2026-08-06T14:08:46Z"
+}

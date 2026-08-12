@@ -259,6 +259,9 @@ apis:
   - url: graphql/schema-stitching-graphql.md
     type: GraphQL
 common:
+- type: License
+  name: MIT
+  url: https://github.com/dotansimha/graphql-code-generator/blob/master/LICENSE
 - type: DomainSecurity
   url: security/graphql-hive-domain-security.yml
 - type: Website

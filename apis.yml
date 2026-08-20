@@ -30,6 +30,41 @@ tags:
 - Microservices
 - Middleware
 - Mocking
+- Open-Source
+- Plugins
+- REST
+- SDK
+- Scalars
+- Schema
+- Schema Composition
+- Schema Merging
+- Schema Registry
+- Schema Stitching
+- Schema Transformation
+- Schema Validation
+- Server
+- Subscription
+- The Guild
+- Type Merging
+- Type Safety
+- TypeScript
+- gRPC
+tags_raw:
+- API Composition
+- API Gateway
+- API Observability
+- Breaking Change Detection
+- CI/CD
+- Code Generation
+- Developer Tools
+- Execution
+- Federation
+- GitHub Actions
+- GraphQL
+- JavaScript
+- Microservices
+- Middleware
+- Mocking
 - Open Source
 - Plugins
 - REST
@@ -73,6 +108,10 @@ apis:
     TypeScript, React Query, Apollo Client, and many other frameworks through its plugin system.
   humanURL: https://the-guild.dev/graphql/codegen
   tags:
+  - Code Generation
+  - GraphQL
+  - SDK
+  tags_raw:
   - Code Generation
   - GraphQL
   - SDKs
@@ -130,6 +169,12 @@ apis:
   - Schema Validation
   - Breaking Change Detection
   - CLI
+  - Open-Source
+  tags_raw:
+  - GraphQL
+  - Schema Validation
+  - Breaking Change Detection
+  - CLI
   - Open Source
   properties:
   - type: Documentation
@@ -151,6 +196,12 @@ apis:
   - Federation
   - API Gateway
   - Schema Composition
+  - Open-Source
+  tags_raw:
+  - GraphQL
+  - Federation
+  - API Gateway
+  - Schema Composition
   - Open Source
   humanURL: https://the-guild.dev/graphql/mesh/docs
   baseURL: https://the-guild.dev/graphql/mesh
@@ -167,6 +218,11 @@ apis:
     EmailAddress, UUID, IPv4, IBAN, JSONObject, etc.) for building precise, type-safe GraphQL schemas
     compatible with any GraphQL server implementation.
   tags:
+  - GraphQL
+  - Scalars
+  - TypeScript
+  - Open-Source
+  tags_raw:
   - GraphQL
   - Scalars
   - TypeScript

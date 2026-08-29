@@ -8,6 +8,19 @@ description: The Guild is an open-source software group building much of the Gra
   (typed clients and servers), GraphQL Inspector (schema diffing and CI checks) and GraphQL Scalars. Every
   product listed here shares the-guild.dev as its home, which is why they are profiled as one provider
   with many APIs rather than as separate companies.
+deliveryModel:
+  model: open-core
+  license: MIT
+  open_source: true
+  commercial: true
+  callable_host: false
+  label: Open core · an OSS project plus a commercial hosted product
+  confidence: high
+  source:
+  - license
+  - pricing
+  generated: '2026-08-28'
+  method: derived
 image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/graphql-hive.png
 created: '2026-08-03'
 modified: '2026-08-03'
@@ -315,6 +328,10 @@ apis:
   - url: graphql/schema-stitching-graphql.md
     type: GraphQL
 common:
+- type: IssueTracker
+  url: https://github.com/dotansimha/graphql-code-generator/issues
+- type: Releases
+  url: https://github.com/dotansimha/graphql-code-generator/releases
 - type: License
   name: MIT
   url: https://github.com/dotansimha/graphql-code-generator/blob/master/LICENSE

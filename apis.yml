@@ -68,7 +68,7 @@ tags:
 - Schema Stitching
 - Schema Transformation
 - Schema Validation
-- Server
+- Servers
 - Subscription
 - The Guild
 - Type Merging
@@ -286,6 +286,9 @@ apis:
 
     '
   tags:
+  - GraphQL
+  - Servers
+  tags_raw:
   - GraphQL
   - Server
   humanURL: https://the-guild.dev/graphql/yoga-server/docs

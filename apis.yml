@@ -56,7 +56,7 @@ tags:
 - Microservices
 - Middleware
 - Mocking
-- Open-Source
+- Open Source
 - Plugins
 - REST
 - SDK
@@ -110,6 +110,7 @@ tags_raw:
 - Type Safety
 - TypeScript
 - gRPC
+- Open-Source
 apis:
 - aid: the-guild-dev:envelop-api
   name: Envelop API
@@ -126,8 +127,6 @@ apis:
   properties:
   - url: https://the-guild.dev/graphql/envelop/docs/getting-started
     type: Documentation
-  - url: graphql/envelop-graphql.md
-    type: GraphQL
 - aid: the-guild-dev:graphql-code-generator
   name: GraphQL Code Generator
   description: GraphQL Code Generator generates typed code from GraphQL schemas and operations, supporting
@@ -148,8 +147,6 @@ apis:
     url: https://the-guild.dev/graphql/codegen/docs/getting-started
   - type: GitHubRepository
     url: https://github.com/dotansimha/graphql-code-generator
-  - url: graphql/graphql-codegen-graphql.md
-    type: GraphQL
 - aid: the-guild-dev:graphql-hive-console-graphql-api
   name: GraphQL Hive Console GraphQL API
   description: The public GraphQL API for Hive Console allows developers to build custom workflows, administer
@@ -177,8 +174,6 @@ apis:
     url: https://api.graphql-hive.com/graphql
   - type: OpenAPI
     url: https://the-guild.dev/graphql/hive/docs/graphql-api/access-token-management
-  - url: graphql/graphql-hive-graphql.md
-    type: GraphQL
   overlays: []
 - aid: the-guild-dev:graphql-inspector-cli
   name: GraphQL Inspector CLI
@@ -195,13 +190,14 @@ apis:
   - Schema Validation
   - Breaking Change Detection
   - CLI
-  - Open-Source
+  - Open Source
   tags_raw:
   - GraphQL
   - Schema Validation
   - Breaking Change Detection
   - CLI
   - Open Source
+  - Open-Source
   properties:
   - type: Documentation
     url: https://the-guild.dev/graphql/inspector/docs
@@ -209,8 +205,6 @@ apis:
     url: https://the-guild.dev/graphql/inspector/docs/installation
   - type: GitHubRepository
     url: https://github.com/graphql-hive/graphql-inspector
-  - type: GraphQL
-    url: graphql/graphql-inspector-graphql.md
   overlays: []
 - aid: the-guild-dev:graphql-mesh-api
   name: GraphQL Mesh API
@@ -222,20 +216,19 @@ apis:
   - Federation
   - API Gateway
   - Schema Composition
-  - Open-Source
+  - Open Source
   tags_raw:
   - GraphQL
   - Federation
   - API Gateway
   - Schema Composition
   - Open Source
+  - Open-Source
   humanURL: https://the-guild.dev/graphql/mesh/docs
   baseURL: https://the-guild.dev/graphql/mesh
   properties:
   - url: https://the-guild.dev/graphql/mesh/docs
     type: Documentation
-  - url: graphql/graphql-mesh-graphql.md
-    type: GraphQL
   - type: JSONSchema
     url: https://raw.githubusercontent.com/api-evangelist/graphql-mesh/refs/heads/main/json-schema/meshrc-configuration.json
 - aid: the-guild-dev:graphql-scalars-api
@@ -247,19 +240,18 @@ apis:
   - GraphQL
   - Scalars
   - TypeScript
-  - Open-Source
+  - Open Source
   tags_raw:
   - GraphQL
   - Scalars
   - TypeScript
   - Open Source
+  - Open-Source
   humanURL: https://the-guild.dev/graphql/scalars/docs
   baseURL: https://the-guild.dev/graphql/scalars
   properties:
   - url: https://the-guild.dev/graphql/scalars/docs
     type: Documentation
-  - url: graphql/graphql-scalars-graphql.md
-    type: GraphQL
 - aid: the-guild-dev:graphql-tools-api
   name: GraphQL Tools API
   description: A set of utilities for faster GraphQL development, enabling SDL-first schema building,
@@ -276,8 +268,6 @@ apis:
   properties:
   - url: https://the-guild.dev/graphql/tools/docs
     type: Documentation
-  - url: graphql/graphql-tools-graphql.md
-    type: GraphQL
 - aid: the-guild-dev:graphql-yoga-server
   name: GraphQL Yoga Server
   description: 'GraphQL Yoga is a self-hosted GraphQL server library — each deployment exposes its own
@@ -296,8 +286,6 @@ apis:
   properties:
   - url: https://the-guild.dev/graphql/yoga-server/docs
     type: Documentation
-  - url: graphql/graphql-yoga-graphql.md
-    type: GraphQL
 - aid: the-guild-dev:hive-gateway
   name: Hive Gateway
   description: Hive Gateway is a federated GraphQL routing engine from The Guild that supports both Apollo
@@ -341,8 +329,6 @@ apis:
     url: https://raw.githubusercontent.com/api-evangelist/schema-stitching/refs/heads/main/json-structure/schema-stitching-config-structure.json
   - type: JSONLD
     url: https://raw.githubusercontent.com/api-evangelist/schema-stitching/refs/heads/main/json-ld/schema-stitching-context.jsonld
-  - url: graphql/schema-stitching-graphql.md
-    type: GraphQL
 common:
 - type: IssueTracker
   url: https://github.com/dotansimha/graphql-code-generator/issues
@@ -517,8 +503,6 @@ common:
   url: https://raw.githubusercontent.com/api-evangelist/schema-stitching/refs/heads/main/examples/schema-stitching-basic-gateway-example.json
 - url: https://graphql-hive.com/llms.txt
   type: LlmsText
-- url: graphql/the-guild-dev-hive-console.graphql
-  type: GraphQL
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com

@@ -97,3 +97,126 @@ plans:
       - 24/7 SLA-based support
       - Custom DPA (Data Processing Agreement)
       - Custom contracts
+x-canonical:
+  generated: '2026-10-08'
+  vocabulary: all/0-working/economics/plans-canonical.yml
+  models:
+  - free
+  - hybrid
+  - metered
+  - negotiated
+  units:
+  - rate
+  - request
+  plans:
+  - name: Free
+    access: freemium
+    model: free
+    model_how: derived
+    units:
+    - rate
+    - request
+    periods:
+    - minute
+    - month
+  - name: Professional
+    access: paid
+    model: metered
+    model_how: derived
+    units:
+    - rate
+    - request
+    periods:
+    - minute
+    - month
+  - name: Enterprise
+    access: enterprise
+    model: free
+    model_how: derived
+    units:
+    - rate
+    - request
+    periods:
+    - minute
+    - month
+  - name: Hobby
+    access: other
+    model: free
+    model_how: derived
+    units: []
+    periods:
+    - month
+  - name: Pro
+    access: other
+    model: hybrid
+    model_how: derived
+    units: []
+    periods:
+    - month
+  - name: Enterprise
+    access: other
+    model: negotiated
+    model_how: derived
+    units: []
+    periods:
+    - month
+  - name: Free
+    access: freemium
+    model: free
+    model_how: derived
+    units:
+    - rate
+    - request
+    periods:
+    - minute
+    - month
+  - name: Professional
+    access: paid
+    model: metered
+    model_how: derived
+    units:
+    - rate
+    - request
+    periods:
+    - minute
+    - month
+  - name: Enterprise
+    access: enterprise
+    model: free
+    model_how: derived
+    units:
+    - rate
+    - request
+    periods:
+    - minute
+    - month
+  - name: Free
+    access: freemium
+    model: free
+    model_how: derived
+    units:
+    - rate
+    - request
+    periods:
+    - minute
+    - month
+  - name: Professional
+    access: paid
+    model: metered
+    model_how: derived
+    units:
+    - rate
+    - request
+    periods:
+    - minute
+    - month
+  - name: Enterprise
+    access: enterprise
+    model: free
+    model_how: derived
+    units:
+    - rate
+    - request
+    periods:
+    - minute
+    - month

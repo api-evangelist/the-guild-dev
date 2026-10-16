@@ -2,6 +2,13 @@
   "repo": "the-guild-dev",
   "feeds": [
     {
+      "source": "https://the-guild.dev/graphql/hive/blog",
+      "feed_url": "https://the-guild.dev/graphql/hive/blog/feed.xml",
+      "title": "",
+      "saved": 0,
+      "method": "discovered"
+    },
+    {
       "source": "https://the-guild.dev/blog",
       "feed_url": "https://the-guild.dev/blog/feed/",
       "title": "",
@@ -9,11 +16,11 @@
       "method": "discovered"
     },
     {
-      "source": "https://linkedin.com/company/the-guild-software",
-      "feed_url": "https://linkedin.com/company/the-guild-software",
+      "source": "https://the-guild.dev/blog/tag/graphql-inspector",
+      "feed_url": "https://the-guild.dev/blog/tag/graphql-inspector/feed/",
       "title": "",
       "saved": 0,
-      "method": "none"
+      "method": "discovered"
     },
     {
       "source": "https://graphql-codegen.com/feed",
@@ -21,13 +28,6 @@
       "title": "",
       "saved": 0,
       "method": "feed"
-    },
-    {
-      "source": "https://github.com/graphql-hive",
-      "feed_url": "https://github.com/graphql-hive",
-      "title": "",
-      "saved": 0,
-      "method": "none"
     },
     {
       "source": "https://the-guild.dev/blog/feed/",
@@ -42,10 +42,24 @@
       "title": "",
       "saved": 0,
       "method": "feed"
+    },
+    {
+      "source": "https://linkedin.com/company/the-guild-software",
+      "feed_url": "https://linkedin.com/company/the-guild-software",
+      "title": "",
+      "saved": 0,
+      "method": "none"
+    },
+    {
+      "source": "https://github.com/graphql-hive",
+      "feed_url": "https://github.com/graphql-hive",
+      "title": "",
+      "saved": 0,
+      "method": "none"
     }
   ],
   "post_count": 16,
-  "fetched": "2026-10-03T12:30:02Z",
+  "fetched": "2026-10-10T13:15:00Z",
   "feed_nature": "vendor-blog",
   "feed_nature_basis": "path_blog",
   "feed_nature_note": "Whether these posts are the vendor publishing or its support community, decided on the URL path grammar of the saved posts -- not the hostname, which carries both on Khoros, and not author diversity, which flags large vendor blogs as forums. 'undetermined' means undetermined."

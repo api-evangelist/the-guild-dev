@@ -44,7 +44,7 @@ tags:
 - API Composition
 - API Gateway
 - API Observability
-- Breaking Change Detection
+- Breaking Changes
 - CI/CD
 - Code Generation
 - Developer Tools
@@ -164,6 +164,12 @@ apis:
   - Schema Registry
   - Observability
   - Usage Tracking
+  - Breaking Changes
+  tags_raw:
+  - GraphQL
+  - Schema Registry
+  - Observability
+  - Usage Tracking
   - Breaking Change Detection
   properties:
   - type: Documentation
@@ -188,7 +194,7 @@ apis:
   tags:
   - GraphQL
   - Schema Validation
-  - Breaking Change Detection
+  - Breaking Changes
   - CLI
   - Open Source
   tags_raw:

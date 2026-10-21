@@ -2,6 +2,11 @@ generated: '2026-10-14'
 method: searched
 checked:
 - https://github.com/marketplace?type=apps
+- https://github.com/graphql-kit/graphql-apis
+- https://github.com/graphql/graphql.github.io/tree/source/src/code
+- https://graphql.landscape2.io/data/full.json
+- https://graphql.org/community/tools-and-libraries/
+- https://graphql.org/foundation/members/
 marketplace_apps: []
 edges:
 - partner_name: GitHub Marketplace (apps)
@@ -22,5 +27,39 @@ edges:
   - Verified domain
   detected_by: sweep-devtools.py
   detected: '2026-10-14'
+- partner_name: GraphQL.org tools and libraries
+  partner: null
+  partner_match: register
+  type: register
+  channel: standard-directory
+  relationship: standard-participant
+  direction: partner-built
+  evidence: https://graphql.org/community/tools-and-libraries/
+  category: GraphQL tooling listing
+  contract_reference:
+    register: GraphQL.org tools and libraries (graphql.org/community/tools-and-libraries; github.com/graphql/graphql.github.io
+      src/code)
+    standard: GraphQL
+    spec_file: null
+    role: graphql-org-listed-vendor
+    registered_name: Hive
+    register_id: src/code/services/hive.md
+    matched_domain: the-guild.dev
+    matched_by: domain+verified
+    listed_products:
+    - product_type: services
+      entries:
+      - Hive
+    - product_type: 'tools: gateways-supergraphs'
+      entries:
+      - Hive Gateway
+    signal_note: 'participation only: a reviewed listing on graphql.org, not a conformance certification; listed
+      products (one per section) are context, never counted'
+    detected_by: sweep-graphql-ecosystem.py
+    detected: '2026-10-21'
+    other_registrations:
+    - Hive Gateway
+  detected_by: sweep-graphql-ecosystem.py
+  first_seen: '2026-10-21'
 source:
 - https://github.com/marketplace?type=apps
